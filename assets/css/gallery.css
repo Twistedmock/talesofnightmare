@@ -228,51 +228,93 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
 main { position: relative; z-index: 10; }
 
 .hang {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  align-items: start;
-  gap: clamp(4rem, 8vw, 10rem) clamp(1.5rem, 3vw, 3rem);
-  max-width: 1500px;
+  max-width: 1360px;
   margin: clamp(4rem, 10vw, 9rem) auto 0;
   padding: 0 clamp(1.25rem, 5vw, 5rem);
 }
 
-/* An irregular hang. Nothing lines up, because nothing lines up in a room
-   where the work was hung one piece at a time over several years. */
-.piece:nth-child(6n+1) { grid-column: 2 / span 5; }
-.piece:nth-child(6n+2) { grid-column: 8 / span 5; margin-top: clamp(3rem, 9vw, 10rem); }
-.piece:nth-child(6n+3) { grid-column: 4 / span 6; }
-.piece:nth-child(6n+4) { grid-column: 1 / span 3; margin-top: clamp(2rem, 6vw, 7rem); }
-.piece:nth-child(6n+5) { grid-column: 7 / span 6; }
-.piece:nth-child(6n+6) { grid-column: 6 / span 5; margin-top: clamp(3rem, 8vw, 9rem); }
-
-/* Visible by default. The fade-in is opt-in via .js-reveal, which the script
-   only adds once it knows it can put the pieces back — otherwise a blocked or
-   broken glass.js would leave the wall permanently blank. */
-.piece { margin-inline: 0; }
-
-.js-reveal .piece {
-  opacity: 0;
-  transform: translateY(26px);
+/* One piece to a row. These are small, quiet drawings — two of them side by
+   side made them compete, and the eye settled on neither. Each now gets the
+   full width, with its caption in the space opposite, and the side alternates
+   so the scroll has a rhythm instead of a column. */
+.piece {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: clamp(2rem, 5vw, 5.5rem);
+  margin-bottom: clamp(7rem, 17vh, 15rem);
 }
-/* The transition lives on the arriving state only. Putting it on the hidden
-   state instead makes every piece below the fold visibly fade *out* a second
-   after load, which is both wrong and distracting. */
-.js-reveal .piece.is-visible {
-  opacity: 1;
-  transform: none;
-  transition: opacity 1.5s var(--ease), transform 1.5s var(--ease);
-}
+.piece:last-child { margin-bottom: 0; }
 
+/* Both elements pull to the outside of the spread: the picture to the outer
+   margin, the caption to the inner edge of its column so it sits beside the
+   work rather than drifting in the middle of empty space. */
+.piece__frame   { justify-self: start; }
+.piece__caption { justify-self: start; }
+
+.piece:nth-child(even) { grid-template-columns: 1fr 1.45fr; }
+.piece:nth-child(even) .piece__frame { order: 2; justify-self: end; }
+.piece:nth-child(even) .piece__caption { order: 1; justify-self: end; text-align: right; }
+
+/* Sized by height, not width, so a whole piece and its caption sit inside the
+   viewport at once — which is the point of showing one at a time. */
 .piece__frame {
   position: relative;
   overflow: hidden;
   background: var(--ink);
+  /* A definite height, not max-height: the image inside is absolutely
+     positioned, so the frame has no content to size itself from, and
+     aspect-ratio needs one real dimension to resolve the other against.
+     With max-height the frame collapsed to zero width. */
+  height: min(74vh, 720px);
+  width: auto;
+  max-width: 100%;
   box-shadow:
     0 1px 0 rgba(255,255,255,.045) inset,
-    0 30px 70px -40px rgba(0,0,0,.95),
-    0 2px 30px -12px rgba(0,0,0,.7);
+    0 40px 90px -50px rgba(0,0,0,.95),
+    0 2px 34px -14px rgba(0,0,0,.72);
 }
+
+/* ------------------------------------------------------- arriving on screen */
+
+/* Visible by default. The reveal is opt-in via .js-reveal, which the script
+   only adds once it knows it can put the pieces back — otherwise a blocked or
+   broken glass.js would leave the wall permanently blank. */
+
+/* The work is uncovered from the bottom up, the way a hand clears a misted
+   pane. The transitions live on the arriving state only: put them on the
+   hidden state and every piece below the fold visibly animates *away* a
+   second after load. */
+.js-reveal .piece__frame {
+  clip-path: inset(0 0 100% 0);
+  transform: scale(1.05);
+  opacity: 0;
+}
+.js-reveal .piece.is-visible .piece__frame {
+  clip-path: inset(0 0 0 0);
+  transform: none;
+  opacity: 1;
+  transition:
+    clip-path 1.5s var(--ease),
+    transform 1.9s var(--ease),
+    opacity   1s   var(--ease);
+}
+
+/* The words follow the picture rather than arriving with it. */
+.js-reveal .piece__caption > * {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.js-reveal .piece.is-visible .piece__caption > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity .95s var(--ease), transform .95s var(--ease);
+}
+.js-reveal .piece.is-visible .piece__numeral { transition-delay: .5s; }
+.js-reveal .piece.is-visible .piece__title   { transition-delay: .64s; }
+.js-reveal .piece.is-visible .piece__words   { transition-delay: .78s; }
+.js-reveal .piece.is-visible .piece__year    { transition-delay: .92s; }
 
 /* The condensation itself — a milky veil sitting on the pane, above the
    blurred work and below the wiped-clear canvas. Doing the fog as its own
@@ -397,8 +439,9 @@ main { position: relative; z-index: 10; }
 /* ------------------------------------------------------------- the caption */
 
 .piece__caption {
-  margin: 1.6rem 0 0;
-  opacity: 0.42;
+  margin: 0;
+  max-width: 34ch;
+  opacity: 0.62;
   transition: opacity 1.4s var(--ease);
 }
 .piece.is-cleared .piece__caption,
@@ -415,19 +458,18 @@ main { position: relative; z-index: 10; }
 
 .piece__title {
   margin: 0;
-  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
   font-weight: 400;
   letter-spacing: 0.035em;
   color: #d7dfea;
 }
 
 .piece__words {
-  margin: 0.6rem 0 0;
+  margin: 0.85rem 0 0;
   font-style: italic;
-  font-size: clamp(0.95rem, 1.5vw, 1.08rem);
-  line-height: 1.65;
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  line-height: 1.72;
   color: var(--text-dim);
-  max-width: 40ch;
   text-wrap: pretty;
 }
 
@@ -587,11 +629,21 @@ main { position: relative; z-index: 10; }
 
 @media (max-width: 900px) {
   .hang {
-    grid-template-columns: 1fr;
-    gap: clamp(4.5rem, 16vw, 8rem);
     margin-top: clamp(3.5rem, 14vw, 7rem);
   }
-  .piece:nth-child(n) { grid-column: 1 / -1; margin-top: 0; }
+  .piece,
+  .piece:nth-child(even) {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    margin-bottom: clamp(5rem, 12vh, 9rem);
+  }
+  .piece:nth-child(even) .piece__frame { order: 1; }
+  .piece:nth-child(even) .piece__caption { order: 2; text-align: left; }
+  .piece__frame { height: min(62vh, 560px); }
+  .piece__frame,
+  .piece:nth-child(even) .piece__frame { justify-self: start; }
+  .piece__caption,
+  .piece:nth-child(even) .piece__caption { max-width: none; justify-self: start; }
   .rail { display: none; }
   .masthead { flex-direction: column; gap: 1.5rem; }
   .plate__step { font-size: 2rem; padding: .6rem; }
