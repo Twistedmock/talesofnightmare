@@ -32,9 +32,17 @@ Three steps.
 **First**, put the image in `artwork/`. Give it a plain lowercase filename with
 no spaces — `the-red-hour.webp`, not `Web_Photo_Editor (20).jpg`.
 
-Export it around **1600px on the long edge** and save as WebP or JPEG. The
-gallery never displays larger, and the whole current collection is 3.6 MB,
-which is what keeps it fast on free hosting.
+Export it around **1600px on the long edge** and save as WebP or JPEG.
+
+Then generate the responsive variants — this is what keeps the site fast:
+
+```sh
+node tools/responsive.mjs      # writes -800w / -1200w in WebP and AVIF
+```
+
+The page serves the smallest file that still looks right, so a phone pulls
+about **1.0 MB for the whole gallery instead of 3.5 MB**. A piece with no
+variants still works; it just ships more bytes.
 
 **Second**, add an entry at the top of the `artworks` list in
 `data/artworks.json`:

@@ -171,17 +171,21 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   gap: 0.6rem;
   padding: 0.55rem 0.9rem;
   background: transparent;
-  border: 1px solid var(--edge);
+  border: 1px solid var(--edge-lit);
   border-radius: 2rem;
-  color: var(--text-faint);
+  color: var(--text-dim);
   font-family: var(--sans);
-  font-size: 0.56rem;
-  letter-spacing: 0.22em;
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color .6s var(--ease), border-color .6s var(--ease);
+  transition: color .6s var(--ease), border-color .6s var(--ease), background .6s var(--ease);
 }
-.glass-toggle:hover { color: var(--text-dim); border-color: var(--edge-lit); }
+.glass-toggle:hover {
+  color: #dbe3ee;
+  border-color: var(--edge-lit);
+  background: rgba(163,184,210,0.06);
+}
 .glass-toggle__dot {
   width: 7px; height: 7px;
   border-radius: 50%;
@@ -345,6 +349,49 @@ main { position: relative; z-index: 10; }
 }
 .glass-on .piece__open {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Ccircle cx='20' cy='20' r='13' fill='none' stroke='rgba(226,236,247,.5)' stroke-width='1'/%3E%3Ccircle cx='20' cy='20' r='1.4' fill='rgba(226,236,247,.6)'/%3E%3C/svg%3E") 20 20, crosshair;
+}
+
+/* The one instruction on the page. Sits above the fog but below the click
+   target, so it never intercepts the wipe it is asking for. */
+.piece__prompt {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  pointer-events: none;
+  font-family: var(--sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(238,244,251,0.82);
+  text-shadow: 0 1px 12px rgba(0,0,0,0.65);
+  white-space: nowrap;
+  animation: promptBreathe 3.4s var(--ease) infinite;
+  transition: opacity .9s var(--ease);
+}
+.glass-on .piece__prompt { display: flex; }
+.piece__prompt.is-done { opacity: 0; animation: none; }
+
+.piece__prompt-line {
+  display: block;
+  width: 54px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(238,244,251,0.8), transparent);
+  animation: promptSweep 3.4s var(--ease) infinite;
+}
+
+@keyframes promptBreathe {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+@keyframes promptSweep {
+  0%, 100% { transform: translateX(-16px); }
+  50%      { transform: translateX(16px); }
 }
 
 /* ------------------------------------------------------------- the caption */

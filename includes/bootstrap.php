@@ -68,6 +68,33 @@ function asset(string $path): string
     return url($path) . ($stamp ? '?v=' . $stamp : '');
 }
 
+/**
+ * Finds the responsive variants sitting next to a master image.
+ *
+ * `artwork/nightwatch.webp` picks up `artwork/nightwatch-800w.avif`,
+ * `-800w.webp`, `-1200w.*` and so on. Missing sizes are simply left out, so a
+ * newly added piece with no variants yet still renders from its master rather
+ * than breaking — it just won't be as small.
+ *
+ * @return array{avif:string[],webp:string[]}
+ */
+function image_variants(string $src): array
+{
+    $dir  = dirname($src);
+    $base = pathinfo($src, PATHINFO_FILENAME);
+    $out  = ['avif' => [], 'webp' => []];
+
+    foreach ([800, 1200, 1600] as $w) {
+        foreach (['avif', 'webp'] as $ext) {
+            $rel = ($dir === '.' ? '' : $dir . '/') . $base . '-' . $w . 'w.' . $ext;
+            if (is_file(APP_ROOT . '/' . $rel)) {
+                $out[$ext][] = url($rel) . ' ' . $w . 'w';
+            }
+        }
+    }
+    return $out;
+}
+
 /* -------------------------------------------------------------------- misc */
 
 /** Roman numerals — the gallery numbers every piece this way. */

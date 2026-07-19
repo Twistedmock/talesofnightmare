@@ -104,13 +104,38 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
     <figure class="piece" data-index="<?= $i ?>" data-id="<?= e($art['id'] ?? (string) $i) ?>"
             style="--fog:<?= $fog ?>; --fx:<?= $fx ?>%; --fy:<?= $fy ?>%">
       <div class="piece__frame" style="aspect-ratio: <?= $w ?> / <?= $h ?>">
-        <img class="piece__image"
-             src="<?= e(url($art['src'])) ?>"
-             alt="<?= e($art['title'] ?? 'Untitled') ?>"
-             width="<?= $w ?>" height="<?= $h ?>"
-             loading="<?= $i < 2 ? 'eager' : 'lazy' ?>"
-             decoding="async">
+        <?php
+          // A piece is drawn at ~92vw on a phone and at most ~720px on a wide
+          // screen, so most visitors only ever need the 800px file. Serving the
+          // master to everyone was costing about 57% more bytes than necessary.
+          $srcset = image_variants((string) $art['src']);
+          $sizes  = '(max-width: 900px) 92vw, (max-width: 1600px) 46vw, 720px';
+        ?>
+        <picture>
+          <?php if ($srcset['avif']): ?>
+            <source type="image/avif" srcset="<?= e(implode(', ', $srcset['avif'])) ?>" sizes="<?= e($sizes) ?>">
+          <?php endif; ?>
+          <?php if ($srcset['webp']): ?>
+            <source type="image/webp" srcset="<?= e(implode(', ', $srcset['webp'])) ?>" sizes="<?= e($sizes) ?>">
+          <?php endif; ?>
+          <img class="piece__image"
+               src="<?= e(url($art['src'])) ?>"
+               alt="<?= e($art['title'] ?? 'Untitled') ?>"
+               width="<?= $w ?>" height="<?= $h ?>"
+               loading="<?= $i < 2 ? 'eager' : 'lazy' ?>"
+               <?= $i === 0 ? 'fetchpriority="high"' : '' ?>
+               decoding="async">
+        </picture>
         <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <?php if ($i === 0): ?>
+          <!-- Without this, the first impression is fifteen grey rectangles and
+               a visitor who assumes the images are broken. Removed for good the
+               moment anything is wiped. -->
+          <span class="piece__prompt" id="wipePrompt" aria-hidden="true">
+            <span class="piece__prompt-line"></span>
+            wipe the glass
+          </span>
+        <?php endif; ?>
         <button type="button" class="piece__open"
                 aria-label="Open <?= e($art['title'] ?? 'Untitled') ?>"></button>
       </div>

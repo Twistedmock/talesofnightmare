@@ -26,6 +26,36 @@
   };
 
   var SEEN_KEY = 'glass.seen.v1';
+  var HINT_KEY = 'glass.hinted.v1';
+
+  /* --------------------------------------------------------- the one hint */
+
+  var promptEl = null;
+
+  /**
+   * Called only from real pointer input, never from the droplets — otherwise
+   * the run-off would dismiss the instruction a second after load, before
+   * anyone had read it.
+   */
+  function dismissPrompt() {
+    if (!promptEl) return;
+    var el = promptEl;
+    promptEl = null;
+    el.classList.add('is-done');
+    try { localStorage.setItem(HINT_KEY, '1'); } catch (e) {}
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1100);
+  }
+
+  function setupPrompt() {
+    promptEl = document.getElementById('wipePrompt');
+    if (!promptEl) return;
+    var known = false;
+    try { known = localStorage.getItem(HINT_KEY) === '1'; } catch (e) {}
+    if (known) {
+      promptEl.parentNode.removeChild(promptEl);
+      promptEl = null;
+    }
+  }
 
   /* --------------------------------------------------------------- memory */
 
@@ -241,6 +271,7 @@
         // Wiping. Pointer events cover mouse, pen and touch in one path.
         frame.addEventListener('pointermove', function (ev) {
           if (!pane.ready) return;
+          dismissPrompt();
           var r = frame.getBoundingClientRect();
           pane.wipe((ev.clientX - r.left) / r.width,
                     (ev.clientY - r.top) / r.height,
@@ -250,6 +281,7 @@
 
         frame.addEventListener('pointerdown', function (ev) {
           if (!pane.ready) return;
+          dismissPrompt();
           var r = frame.getBoundingClientRect();
           pane.wipe((ev.clientX - r.left) / r.width,
                     (ev.clientY - r.top) / r.height,
@@ -345,7 +377,8 @@
       var self = this;
       this.items = [].slice.call(document.querySelectorAll('.piece')).map(function (fig) {
         return {
-          src: fig.querySelector('.piece__image').getAttribute('src'),
+          src: fig.querySelector('.piece__image').currentSrc
+                 || fig.querySelector('.piece__image').getAttribute('src'),
           title: (fig.querySelector('.piece__title') || {}).textContent || '',
           words: (fig.querySelector('.piece__words') || {}).textContent || '',
           numeral: (fig.querySelector('.piece__numeral') || {}).textContent || '',
@@ -449,6 +482,7 @@
     var btn = document.getElementById('glassToggle');
     if (!btn) return;
     btn.addEventListener('click', function () {
+      dismissPrompt();
       var off = root.classList.toggle('no-glass');
       root.classList.toggle('glass-on', !off);
       btn.setAttribute('aria-pressed', off ? 'true' : 'false');
@@ -513,6 +547,7 @@
     if (!panes.length) { reveal(); return; }
 
     root.classList.add('glass-on');
+    setupPrompt();
     observe();
     requestAnimationFrame(loop);
 
