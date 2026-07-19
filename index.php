@@ -73,10 +73,13 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
       <?php endif; ?>
     </div>
   </div>
+  <!-- The glass starts clear: a visitor should meet the work, not a wall of
+       fog they have to learn to get past. aria-pressed tracks "cleared", so it
+       begins true and glass.js flips it if a returning visitor chose fog. -->
   <button type="button" class="glass-toggle" id="glassToggle"
-          aria-pressed="false" title="Show every piece without the glass">
+          aria-pressed="true" title="Put the glass back and wipe it yourself">
     <span class="glass-toggle__dot" aria-hidden="true"></span>
-    <span class="glass-toggle__label">clear the glass</span>
+    <span class="glass-toggle__label">let it fog</span>
   </button>
 </header>
 

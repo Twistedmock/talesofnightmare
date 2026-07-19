@@ -182,10 +182,13 @@ The condensation is a canvas layer over each piece. Moving the cursor wipes it,
 droplets run down and clear their own trails, and the fog slowly returns. In
 the lightbox the fog creeps back from the edges, so nothing stays clear.
 
+- **The glass starts clear.** A first-time visitor meets the work in full
+  colour; **"let it fog"** in the top right offers the effect, and the choice is
+  remembered. Fog is what the gallery is *for*, but it is still fog in front of
+  somebody's drawings, and nobody should have to learn a trick to see them.
 - The gallery **works without JavaScript** — the fog is layered on top of a
   plain, sharp, readable page. If the script is blocked, the work is still there.
-- **"clear the glass"** in the top right turns the effect off, and
-  `prefers-reduced-motion` turns it off automatically.
+- `prefers-reduced-motion` keeps the glass clear automatically.
 - The site remembers which pieces you have cleared, in your browser only, and
   the footer keeps a quiet count.
 

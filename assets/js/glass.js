@@ -27,6 +27,10 @@
 
   var SEEN_KEY = 'glass.seen.v1';
   var HINT_KEY = 'glass.hinted.v1';
+  var FOG_KEY  = 'glass.fog.v1';
+
+  // Off unless the visitor turns it on, or turned it on last time.
+  var fogOn = false;
 
   /* --------------------------------------------------------- the one hint */
 
@@ -329,6 +333,13 @@
     if (now - last < interval) return;
     last = now;
 
+    // Nothing to draw while the glass is clear — the canvases are hidden, and
+    // rendering fifteen of them anyway would cost battery for no picture.
+    if (!fogOn) {
+      if (plate.pane && plate.open) plate.tickPane();
+      return;
+    }
+
     for (var i = 0; i < panes.length; i++) {
       if (!panes[i].active || !panes[i].ready) continue;
       panes[i].tick();
@@ -478,19 +489,43 @@
 
   /* ----------------------------------------------------------- the toggle */
 
+  /**
+   * The glass is off unless the visitor asks for it, and the choice sticks.
+   *
+   * Fog is the thing this gallery is *for*, but it is still fog in front of
+   * somebody's drawings — a first-time visitor should see the work, decide
+   * they like it, and only then be offered the trick.
+   */
+  function applyFog(on, btn) {
+    fogOn = on;
+    root.classList.toggle('glass-on', on);
+    root.classList.toggle('no-glass', !on);
+
+    if (btn) {
+      btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+      btn.setAttribute('title', on ? 'Show every piece without the glass'
+                                   : 'Put the glass back and wipe it yourself');
+      btn.querySelector('.glass-toggle__label').textContent = on ? 'clear the glass' : 'let it fog';
+    }
+
+    // With no fog there is nothing to clear, so every caption reads at full
+    // strength rather than waiting to be earned.
+    if (!on) {
+      document.querySelectorAll('.piece').forEach(function (f) { f.classList.add('is-cleared'); });
+    }
+    try { localStorage.setItem(FOG_KEY, on ? '1' : '0'); } catch (e) {}
+  }
+
   function toggle() {
     var btn = document.getElementById('glassToggle');
-    if (!btn) return;
+    if (!btn) return null;
     btn.addEventListener('click', function () {
-      dismissPrompt();
-      var off = root.classList.toggle('no-glass');
-      root.classList.toggle('glass-on', !off);
-      btn.setAttribute('aria-pressed', off ? 'true' : 'false');
-      btn.querySelector('.glass-toggle__label').textContent = off ? 'let it fog' : 'clear the glass';
-      if (off) {
-        document.querySelectorAll('.piece').forEach(function (f) { f.classList.add('is-cleared'); });
-      }
+      // Turning fog *on* is a request to see it, so the prompt stays. Turning
+      // it off means they are done with it.
+      if (fogOn) dismissPrompt();
+      applyFog(!fogOn, btn);
     });
+    return btn;
   }
 
   /* ------------------------------------------------------------- the veil */
@@ -530,12 +565,12 @@
     veil();
     rail();
     tally();
-    toggle();
+    var toggleBtn = toggle();
     plate.init();
 
     // The fog is the enhancement. If it cannot run, the art stays visible.
     if (reduced) {
-      root.classList.add('no-glass');
+      applyFog(false, toggleBtn);
       reveal();
       document.querySelectorAll('.piece').forEach(function (f) {
         f.classList.add('is-visible', 'is-cleared');
@@ -546,7 +581,12 @@
     build();
     if (!panes.length) { reveal(); return; }
 
-    root.classList.add('glass-on');
+    // The panes are built regardless so switching the fog on is instant, but
+    // it stays clear until asked for.
+    var wanted = false;
+    try { wanted = localStorage.getItem(FOG_KEY) === '1'; } catch (e) {}
+    applyFog(wanted, toggleBtn);
+
     setupPrompt();
     observe();
     requestAnimationFrame(loop);
