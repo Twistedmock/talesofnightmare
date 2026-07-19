@@ -186,12 +186,47 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   border-color: var(--edge-lit);
   background: rgba(163,184,210,0.06);
 }
+/* A slow sweep of light across the label — the same thing that happens when a
+   reflection crosses a pane. It runs only until the visitor has used the
+   control once, because after that it would just be noise. */
+.glass-toggle__label {
+  background-image: linear-gradient(100deg,
+    var(--text-dim) 0%, var(--text-dim) 40%,
+    #f2f7fd 50%,
+    var(--text-dim) 60%, var(--text-dim) 100%);
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: glassSweep 5s var(--ease) infinite;
+}
+.glass-toggle:hover .glass-toggle__label,
+.glass-toggle.is-known .glass-toggle__label {
+  animation: none;
+  background-image: none;
+  color: inherit;
+}
+
+@keyframes glassSweep {
+  0%        { background-position: 130% 0; }
+  45%, 100% { background-position: -30% 0; }
+}
+
 .glass-toggle__dot {
   width: 7px; height: 7px;
   border-radius: 50%;
   background: var(--text-faint);
   box-shadow: 0 0 0 0 rgba(163,103,90,.5);
   transition: background .6s var(--ease), box-shadow .6s var(--ease);
+  animation: glassBeat 5s var(--ease) infinite;
+}
+.glass-toggle:hover .glass-toggle__dot,
+.glass-toggle.is-known .glass-toggle__dot { animation: none; }
+
+@keyframes glassBeat {
+  0%, 40%, 100% { background: var(--text-faint); box-shadow: 0 0 0 0 rgba(226,236,247,0); }
+  18%           { background: #e6eef8;           box-shadow: 0 0 9px 1px rgba(226,236,247,.4); }
 }
 .glass-toggle[aria-pressed="true"] .glass-toggle__dot {
   background: var(--sorrow);
@@ -657,6 +692,15 @@ main { position: relative; z-index: 10; }
 /* Wiping fog is a motion effect and a fine motor task. Opt out entirely. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+
+  /* The label is painted through a moving gradient, so freezing the animation
+     is not enough — without this it could be left mid-sweep and unreadable. */
+  .glass-toggle__label {
+    animation: none;
+    background-image: none;
+    color: inherit;
+  }
+  .glass-toggle__dot { animation: none; }
   *, *::before, *::after {
     animation-duration: .001ms !important;
     animation-iteration-count: 1 !important;

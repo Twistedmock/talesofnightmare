@@ -29,8 +29,10 @@
   var HINT_KEY = 'glass.hinted.v1';
   var FOG_KEY  = 'glass.fog.v1';
 
-  // Off unless the visitor turns it on, or turned it on last time.
-  var fogOn = false;
+  // On by default — the fog is the point of the gallery. A visitor who turns
+  // it off keeps it off.
+  var fogOn = true;
+  var TOUCHED_KEY = 'glass.toggled.v1';
 
   /* --------------------------------------------------------- the one hint */
 
@@ -519,11 +521,19 @@
   function toggle() {
     var btn = document.getElementById('glassToggle');
     if (!btn) return null;
+    // The sweep of light is only there to be noticed. Once the visitor has
+    // used the control, it has done its job and stops.
+    var known = false;
+    try { known = localStorage.getItem(TOUCHED_KEY) === '1'; } catch (e) {}
+    if (known) btn.classList.add('is-known');
+
     btn.addEventListener('click', function () {
       // Turning fog *on* is a request to see it, so the prompt stays. Turning
       // it off means they are done with it.
       if (fogOn) dismissPrompt();
       applyFog(!fogOn, btn);
+      btn.classList.add('is-known');
+      try { localStorage.setItem(TOUCHED_KEY, '1'); } catch (e) {}
     });
     return btn;
   }
@@ -583,9 +593,9 @@
 
     // The panes are built regardless so switching the fog on is instant, but
     // it stays clear until asked for.
-    var wanted = false;
-    try { wanted = localStorage.getItem(FOG_KEY) === '1'; } catch (e) {}
-    applyFog(wanted, toggleBtn);
+    var stored = null;
+    try { stored = localStorage.getItem(FOG_KEY); } catch (e) {}
+    applyFog(stored === null ? true : stored === '1', toggleBtn);
 
     setupPrompt();
     observe();
