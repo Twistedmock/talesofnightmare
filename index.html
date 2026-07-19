@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap">
-<link rel="stylesheet" href="assets/css/gallery.css?v=1784484949">
+<link rel="stylesheet" href="assets/css/gallery.css?v=1784486668">
 <link rel="icon" href="assets/favicon.svg?v=1784442321" type="image/svg+xml">
 
 <!-- Deliberately render-blocking: it must set up the reveal before first paint. -->
@@ -52,6 +52,10 @@
        did not realise they could turn off. aria-pressed tracks "cleared". -->
   <button type="button" class="glass-toggle" id="glassToggle"
           aria-pressed="false" title="Show every piece without the glass">
+    <!-- The halo is a real element, not ::after, so the script can hand its
+         current opacity over to a transition when the glow stops. Killing a
+         CSS animation snaps the value; fading it needs something to hold. -->
+    <span class="glass-toggle__halo" aria-hidden="true"></span>
     <span class="glass-toggle__dot" aria-hidden="true"></span>
     <span class="glass-toggle__label">clear the glass</span>
   </button>
@@ -454,6 +458,6 @@
   <button type="button" class="plate__step plate__step--next" id="plateNext" aria-label="Next">&#8250;</button>
 </div>
 
-<script src="assets/js/glass.js?v=1784484288" defer></script>
+<script src="assets/js/glass.js?v=1784486807" defer></script>
 </body>
 </html>

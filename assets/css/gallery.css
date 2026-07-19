@@ -168,8 +168,13 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
+  position: relative;
+  justify-content: center;
   gap: 0.6rem;
   padding: 0.62rem 1.05rem;
+  /* Wide enough for the longer of the two labels, so swapping them cannot
+     resize the button underneath the cursor. */
+  min-width: 12.4rem;
   background: transparent;
   border: 1px solid var(--edge-lit);
   border-radius: 2rem;
@@ -179,41 +184,40 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   letter-spacing: 0.2em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color .6s var(--ease), border-color .6s var(--ease), background .6s var(--ease);
+  transition: color .6s var(--ease), border-color .6s var(--ease),
+              background .6s var(--ease), box-shadow .6s var(--ease);
 }
 .glass-toggle:hover {
   color: #dbe3ee;
   border-color: var(--edge-lit);
   background: rgba(163,184,210,0.06);
 }
-/* Until the visitor has used it once, the control breathes: border, text and
-   dot all warm together and settle back on one symmetrical ease-in-out cycle.
-   Nothing slides. An earlier version dragged a gradient across the label, and
-   at 10px letterspaced caps that reads as a glitch rather than a highlight —
-   interpolating colour is smooth at any size, and syncing the dot to the same
-   timing stops it looking like two things blinking independently. */
-.glass-toggle:not(.is-known):not(:hover) {
-  animation: toggleBreath 4.6s ease-in-out infinite;
+/* The glow is tied to there actually being fog to clear — not to a flag
+   remembering whether the visitor has clicked before. The old version stopped
+   for good on first use, which meant anyone returning never saw it again and
+   the control looked inert. Condition, not history. */
+.glass-toggle__halo {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid rgba(220, 236, 255, 0.72);
+  box-shadow: 0 0 26px -3px rgba(200, 218, 240, 0.55),
+              inset 0 0 14px -6px rgba(210, 228, 250, 0.5);
+  transition: opacity .7s var(--ease);
 }
-.glass-toggle:not(.is-known):not(:hover) .glass-toggle__dot {
+.glass-on .glass-toggle .glass-toggle__halo {
+  animation: haloBreath 4.6s ease-in-out infinite;
+}
+.glass-on .glass-toggle .glass-toggle__dot {
   animation: dotBreath 4.6s ease-in-out infinite;
 }
 
-@keyframes toggleBreath {
-  0%, 100% {
-    color: var(--text-dim);
-    border-color: rgba(190, 210, 235, 0.20);
-    box-shadow: 0 0 0 0 rgba(200, 218, 240, 0);
-    background: transparent;
-  }
-  50% {
-    color: #eef4fb;
-    border-color: rgba(216, 232, 252, 0.62);
-    box-shadow: 0 0 22px -3px rgba(200, 218, 240, 0.32);
-    background: rgba(180, 205, 235, 0.05);
-  }
+@keyframes haloBreath {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 0.95; }
 }
-
 @keyframes dotBreath {
   0%, 100% { background: var(--text-faint); box-shadow: 0 0 0 0 rgba(226, 236, 247, 0); }
   50%      { background: #e8f0fa;           box-shadow: 0 0 11px 1px rgba(226, 236, 247, 0.5); }
@@ -225,6 +229,9 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   background: var(--text-faint);
   box-shadow: 0 0 0 0 rgba(163,103,90,.5);
   transition: background .6s var(--ease), box-shadow .6s var(--ease);
+}
+.glass-toggle__label {
+  transition: opacity .22s var(--ease);
 }
 .glass-toggle[aria-pressed="true"] .glass-toggle__dot {
   background: var(--sorrow);
@@ -691,14 +698,11 @@ main { position: relative; z-index: 10; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 
-  /* Must out-specify .glass-toggle:not(.is-known):not(:hover), which is where
-     the breathing is declared — a bare .glass-toggle selector loses to it. */
-  .glass-toggle:not(.is-known):not(:hover),
-  .glass-toggle:not(.is-known):not(:hover) .glass-toggle__dot {
-    animation: none;
-    color: #b9c6d6;
-    border-color: var(--edge-lit);
-  }
+  /* Must out-specify .glass-on .glass-toggle …, which is where the breathing
+     is declared — a bare .glass-toggle selector loses to it. */
+  .glass-on .glass-toggle:not(:hover) .glass-toggle__halo,
+  .glass-on .glass-toggle .glass-toggle__dot { animation: none; }
+  .glass-toggle__halo { opacity: 0; }
   *, *::before, *::after {
     animation-duration: .001ms !important;
     animation-iteration-count: 1 !important;

@@ -78,6 +78,10 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
        did not realise they could turn off. aria-pressed tracks "cleared". -->
   <button type="button" class="glass-toggle" id="glassToggle"
           aria-pressed="false" title="Show every piece without the glass">
+    <!-- The halo is a real element, not ::after, so the script can hand its
+         current opacity over to a transition when the glow stops. Killing a
+         CSS animation snaps the value; fading it needs something to hold. -->
+    <span class="glass-toggle__halo" aria-hidden="true"></span>
     <span class="glass-toggle__dot" aria-hidden="true"></span>
     <span class="glass-toggle__label">clear the glass</span>
   </button>

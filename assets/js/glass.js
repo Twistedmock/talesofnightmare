@@ -34,7 +34,6 @@
   // On by default — the fog is the point of the gallery. A visitor who turns
   // it off keeps it off.
   var fogOn = true;
-  var TOUCHED_KEY = 'glass.toggled.v1';
 
   /* --------------------------------------------------------- the one hint */
 
@@ -508,6 +507,14 @@
    *   visitor pinned to the old behaviour by a preference they never set.
    */
   function applyFog(on, btn, persist) {
+    var halo = btn ? btn.querySelector('.glass-toggle__halo') : null;
+
+    // Read the glow BEFORE anything below changes a class. Dropping .glass-on
+    // removes the rule the animation lives on, and the computed opacity snaps
+    // to zero the instant it goes — so measured any later this is always 0 and
+    // the fade has nothing to start from.
+    var lit = (halo && !on) ? getComputedStyle(halo).opacity : null;
+
     fogOn = on;
     root.classList.toggle('glass-on', on);
     root.classList.toggle('no-glass', !on);
@@ -516,7 +523,31 @@
       btn.setAttribute('aria-pressed', on ? 'false' : 'true');
       btn.setAttribute('title', on ? 'Show every piece without the glass'
                                    : 'Put the glass back and wipe it yourself');
-      btn.querySelector('.glass-toggle__label').textContent = on ? 'clear the glass' : 'let it fog';
+
+      // Pin the glow where it was, then let the transition carry it down.
+      if (halo) {
+        if (on) {
+          halo.style.animation = '';
+          halo.style.opacity = '';
+        } else {
+          halo.style.animation = 'none';
+          halo.style.opacity = lit;
+          void halo.offsetWidth;                       // commit before changing it
+          halo.style.opacity = '0';
+        }
+      }
+
+      // Swap the words behind a short fade; the button has a min-width so it
+      // cannot resize under the cursor while they change.
+      var label = btn.querySelector('.glass-toggle__label');
+      var next = on ? 'clear the glass' : 'let it fog';
+      if (label && label.textContent.trim() !== next) {
+        label.style.opacity = '0';
+        setTimeout(function () {
+          label.textContent = next;
+          label.style.opacity = '';
+        }, 200);
+      }
     }
 
     // With no fog there is nothing to clear, so every caption reads at full
@@ -532,19 +563,11 @@
   function toggle() {
     var btn = document.getElementById('glassToggle');
     if (!btn) return null;
-    // The sweep of light is only there to be noticed. Once the visitor has
-    // used the control, it has done its job and stops.
-    var known = false;
-    try { known = localStorage.getItem(TOUCHED_KEY) === '1'; } catch (e) {}
-    if (known) btn.classList.add('is-known');
-
     btn.addEventListener('click', function () {
       // Turning fog *on* is a request to see it, so the prompt stays. Turning
       // it off means they are done with it.
       if (fogOn) dismissPrompt();
       applyFog(!fogOn, btn, true);
-      btn.classList.add('is-known');
-      try { localStorage.setItem(TOUCHED_KEY, '1'); } catch (e) {}
     });
     return btn;
   }
