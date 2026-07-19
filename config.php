@@ -36,5 +36,5 @@ return [
     // Where the site actually lives. Used only for the link preview that
     // appears when somebody shares it — those need a full URL, not a relative
     // one. Leave '' and the preview image is simply left off.
-    'siteUrl'    => 'https://twistedmock.github.io/talesofnightmare/',
+    'siteUrl'    => 'https://talesofnightmare.com/',
 ];

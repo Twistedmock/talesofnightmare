@@ -21,7 +21,7 @@ includes/            bootstrap and the JSON reader
 router.php           only used by `php -S`; ignored elsewhere
 ```
 
-**Live at <https://twistedmock.github.io/talesofnightmare/>**
+**Live at <https://talesofnightmare.com>**
 
 ---
 
@@ -89,7 +89,7 @@ so the page is pre-rendered rather than generated per visit — and rendering it
 from the template means the markup is only ever described in one place.
 
 The build refuses to write a broken page: it fails if there is no artwork, or
-if any link came out root-relative (which would break under `/talesofnightmare/`).
+if any link came out root-relative.
 
 **If you forget to run `php build.php`, the live site will not change.** The
 JSON is the content; `index.html` is what visitors get.
@@ -111,8 +111,12 @@ Instagram accepts a full URL or a bare handle — `https://instagram.com/you`,
 ## 3. Hosting
 
 It is on **GitHub Pages**, served from the `main` branch of
-`Twistedmock/talesofnightmare`. Push, wait about a minute, and the change is
-live. Free, HTTPS included, no server to maintain.
+`Twistedmock/talesofnightmare`, on the custom domain **talesofnightmare.com**
+(registered at Spaceship). Push, wait about a minute, and the change is live.
+Free, HTTPS included, no server to maintain.
+
+The domain is held in the repo by the `CNAME` file. Deleting that file drops
+the custom domain, so leave it alone.
 
 ### Putting a real domain on it
 
