@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 112" width="140" height="112" role="img" aria-label="Tales of Nightmare">
+  <title>Tales of Nightmare</title>
+  <!--
+    Drawn in the artist's own language: one continuous line, the way the work
+    in this gallery is drawn. A face asleep, under the crescent it is dreaming
+    beneath. The blue is the cobalt Inam keeps returning to.
+  -->
+  <defs>
+    <!-- Two overlapping circles, not an arc pair: an arc-built crescent needs
+         radii larger than half the chord, and when they are not, SVG silently
+         scales them equal and the shape collapses to nothing. -->
+    <mask id="crescent">
+      <rect width="140" height="112" fill="#000"/>
+      <circle cx="108" cy="34" r="20" fill="#fff"/>
+      <circle cx="119" cy="27" r="17.5" fill="#000"/>
+    </mask>
+  </defs>
+
+  <g opacity="0.94">
+    <circle cx="108" cy="34" r="20" fill="#5b7cb8" mask="url(#crescent)"/>
+    <circle cx="112" cy="66" r="1.9" fill="#5b7cb8" opacity="0.45"/>
+    <circle cx="98" cy="78" r="1.2" fill="#5b7cb8" opacity="0.3"/>
+  </g>
+
+  <g fill="none" stroke="#e6ded0" stroke-width="2.3"
+     stroke-linecap="round" stroke-linejoin="round">
+    <!-- Head in profile. Few inflections on purpose — the features in Inam's
+         drawings are three or four confident strokes, never a cluster of
+         small ones. -->
+    <path d="M46 21
+             C62 19 76 30 75 45
+             C74.5 49 79 55 81 60
+             C82 63 77 64 74 64.5
+             C77 67 76 71 72.5 73
+             C75 77 73 82 68 86
+             C61 91 51 92 44 89
+             C34 85 30 74 30 62
+             C30 44 32 29 46 21 Z"/>
+
+    <!-- Eye, closed. -->
+    <path d="M49 44 C54.5 40.5 62 41.5 66 45.5" stroke-width="2.1"/>
+    <!-- Mouth, barely there. -->
+    <path d="M62 69.5 C65.5 68.8 68.5 69.4 70.5 70.4" stroke-width="1.5" opacity="0.8"/>
+  </g>
+</svg>

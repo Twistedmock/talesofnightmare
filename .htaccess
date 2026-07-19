@@ -1,0 +1,47 @@
+# Apache config for the gallery. Free PHP hosts are almost always Apache with
+# AllowOverride on, so this is where the hardening lives. Directives are wrapped
+# in <IfModule> so a host missing a module does not 500 the whole site.
+
+# --- default document ---------------------------------------------------
+DirectoryIndex index.php index.html
+
+# --- never list a directory ---------------------------------------------
+Options -Indexes
+
+# --- keep private folders private ---------------------------------------
+# These also carry their own .htaccess, because belt and braces costs nothing.
+RedirectMatch 404 ^/(.*/)?(data|includes)(/.*)?$
+
+# --- do not serve the dotfiles or the readme ----------------------------
+<FilesMatch "^\.|(^|/)(README\.md|config\.php|package(-lock)?\.json)$">
+  Require all denied
+</FilesMatch>
+
+# --- security headers ----------------------------------------------------
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+  # Uploaded images are served from this origin; nothing here needs to be framed
+  # or to run third-party script beyond the webfont stylesheet.
+  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'"
+</IfModule>
+
+# --- caching -------------------------------------------------------------
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png  "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/avif "access plus 1 month"
+  ExpiresByType image/gif  "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  # CSS and JS carry a ?v= stamp from filemtime, so they can be cached hard.
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

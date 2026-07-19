@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TALES OF NIGHTMARE — Drawings by Inam</title>
+<meta name="description" content="Drawings by Inam. A gallery behind glass — wipe the condensation to see the work.">
+<meta name="theme-color" content="#0b0e14">
+
+<link rel="canonical" href="https://twistedmock.github.io/talesofnightmare/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TALES OF NIGHTMARE">
+<meta property="og:description" content="Drawings by Inam. A gallery behind glass — wipe the condensation to see the work.">
+<meta property="og:url" content="https://twistedmock.github.io/talesofnightmare/">
+<meta property="og:image" content="https://twistedmock.github.io/talesofnightmare/artwork/nightwatch.webp">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap">
+<link rel="stylesheet" href="assets/css/gallery.css?v=1784442467">
+<link rel="icon" href="assets/favicon.svg?v=1784442321" type="image/svg+xml">
+
+<!-- Deliberately render-blocking: it must set up the reveal before first paint. -->
+<script src="assets/js/boot.js?v=1784404136"></script>
+</head>
+<body>
+
+<!-- Breathed onto the glass, then cleared. Shown once per visit. -->
+<div class="veil" id="veil" aria-hidden="true">
+  <div class="veil__inner">
+    <img class="veil__mark" src="assets/mark.svg?v=1784442292" alt=""
+         width="140" height="112">
+    <h1 class="veil__name">TALES OF NIGHTMARE</h1>
+    <p class="veil__hint">breathe on the glass</p>
+  </div>
+</div>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="masthead__bar">
+    <img class="masthead__mark" src="assets/mark.svg?v=1784442292" alt=""
+         width="140" height="112" decoding="async">
+    <div>
+      <p class="masthead__name">TALES OF NIGHTMARE</p>
+              <p class="masthead__tagline">Drawings by Inam</p>
+          </div>
+  </div>
+  <button type="button" class="glass-toggle" id="glassToggle"
+          aria-pressed="false" title="Show every piece without the glass">
+    <span class="glass-toggle__dot" aria-hidden="true"></span>
+    <span class="glass-toggle__label">clear the glass</span>
+  </button>
+</header>
+
+<!-- Fills as you descend. Cold, slow, and slightly reluctant. -->
+<div class="rail" aria-hidden="true">
+  <div class="rail__track"><div class="rail__fill" id="railFill"></div></div>
+</div>
+
+<main id="gallery">
+  <section class="hang">
+        <figure class="piece" data-index="0" data-id="art-nightwatch"
+            style="--fog:0.74; --fx:16%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1122 / 1402">
+        <img class="piece__image"
+             src="artwork/nightwatch.webp"
+             alt="Nightwatch"
+             width="1122" height="1402"
+             loading="eager"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open Nightwatch"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">I</span>
+        <h2 class="piece__title">Nightwatch</h2>
+                  <p class="piece__words">Cheek to cheek, both of them asleep. The cat will not move all night, and that is the whole arrangement.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="1" data-id="art-the-mouth-that-keeps-me"
+            style="--fog:0.84; --fx:69%; --fy:39%">
+      <div class="piece__frame" style="aspect-ratio: 1023 / 1537">
+        <img class="piece__image"
+             src="artwork/the-mouth-that-keeps-me.webp"
+             alt="The Mouth That Keeps Me"
+             width="1023" height="1537"
+             loading="eager"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open The Mouth That Keeps Me"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">II</span>
+        <h2 class="piece__title">The Mouth That Keeps Me</h2>
+                  <p class="piece__words">Somebody is curled up inside the open mouth. Not swallowed. Kept.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="2" data-id="art-there-is-a-theory"
+            style="--fog:0.94; --fx:60%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1168 / 1347">
+        <img class="piece__image"
+             src="artwork/there-is-a-theory.webp"
+             alt="There Is a Theory"
+             width="1168" height="1347"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open There Is a Theory"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">III</span>
+        <h2 class="piece__title">There Is a Theory</h2>
+                  <p class="piece__words">A head on a shoulder and hair over everything. She has done this before, and will do it again tomorrow.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="3" data-id="art-what-floats-what-doesnt"
+            style="--fog:0.77; --fx:51%; --fy:39%">
+      <div class="piece__frame" style="aspect-ratio: 1023 / 1537">
+        <img class="piece__image"
+             src="artwork/what-floats-what-doesnt.webp"
+             alt="What Floats, What Doesn’t"
+             width="1023" height="1537"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open What Floats, What Doesn’t"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">IV</span>
+        <h2 class="piece__title">What Floats, What Doesn’t</h2>
+                  <p class="piece__words">One face above the water and one below it, and a boat too small to be any use to either.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="4" data-id="art-one-line-two-people"
+            style="--fog:0.87; --fx:42%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1055 / 1491">
+        <img class="piece__image"
+             src="artwork/one-line-two-people.webp"
+             alt="One Line, Two People"
+             width="1055" height="1491"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open One Line, Two People"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">V</span>
+        <h2 class="piece__title">One Line, Two People</h2>
+                  <p class="piece__words">Two faces drawn without the pen leaving the paper. There is no point along it where one of them ends.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="5" data-id="art-the-red-hour"
+            style="--fog:0.97; --fx:33%; --fy:39%">
+      <div class="piece__frame" style="aspect-ratio: 1080 / 1456">
+        <img class="piece__image"
+             src="artwork/the-red-hour.webp"
+             alt="The Red Hour"
+             width="1080" height="1456"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open The Red Hour"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">VI</span>
+        <h2 class="piece__title">The Red Hour</h2>
+                  <p class="piece__words">Grey ground, grey people, a moon with a bite taken out of it. The only colour is the flower the small one is holding.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="6" data-id="art-the-quiet-after"
+            style="--fog:0.8; --fx:24%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1083 / 1452">
+        <img class="piece__image"
+             src="artwork/the-quiet-after.webp"
+             alt="The Quiet After"
+             width="1083" height="1452"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open The Quiet After"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">VII</span>
+        <h2 class="piece__title">The Quiet After</h2>
+                  <p class="piece__words">Two people sitting with their backs to you. Whatever it was, it is finished now.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="7" data-id="art-synthetic-reverie"
+            style="--fog:0.9; --fx:77%; --fy:39%">
+      <div class="piece__frame" style="aspect-ratio: 1254 / 1254">
+        <img class="piece__image"
+             src="artwork/synthetic-reverie.webp"
+             alt="Synthetic Reverie"
+             width="1254" height="1254"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open Synthetic Reverie"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">VIII</span>
+        <h2 class="piece__title">Synthetic Reverie</h2>
+                  <p class="piece__words">Orange laid over blue on a sketchbook page. Faces put together out of whatever was on the desk.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="8" data-id="art-the-cat-knew-first"
+            style="--fog:1; --fx:68%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1023 / 1442">
+        <img class="piece__image"
+             src="artwork/the-cat-knew-first.webp"
+             alt="The Cat Knew First"
+             width="1023" height="1442"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open The Cat Knew First"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">IX</span>
+        <h2 class="piece__title">The Cat Knew First</h2>
+                  <p class="piece__words">The cat is watching something above the frame. The face underneath has come apart trying to see it too.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="9" data-id="art-we-grew-into-the-tree"
+            style="--fog:0.83; --fx:59%; --fy:39%">
+      <div class="piece__frame" style="aspect-ratio: 1024 / 1536">
+        <img class="piece__image"
+             src="artwork/we-grew-into-the-tree.webp"
+             alt="We Grew Into the Tree"
+             width="1024" height="1536"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open We Grew Into the Tree"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">X</span>
+        <h2 class="piece__title">We Grew Into the Tree</h2>
+                  <p class="piece__words">Two people holding on long enough to become the trunk. The roots arrived afterwards.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="10" data-id="art-the-weather-was-only-above-us"
+            style="--fog:0.93; --fx:50%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1084 / 1451">
+        <img class="piece__image"
+             src="artwork/the-weather-was-only-above-us.webp"
+             alt="The Weather Was Only Above Us"
+             width="1084" height="1451"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open The Weather Was Only Above Us"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">XI</span>
+        <h2 class="piece__title">The Weather Was Only Above Us</h2>
+                  <p class="piece__words">All that weather in the top half. Down at the bottom, two people and a sunflower, not looking up.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="11" data-id="art-sitting-with-it"
+            style="--fog:0.76; --fx:41%; --fy:39%">
+      <div class="piece__frame" style="aspect-ratio: 1024 / 1536">
+        <img class="piece__image"
+             src="artwork/sitting-with-it.webp"
+             alt="Sitting With It"
+             width="1024" height="1536"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open Sitting With It"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">XII</span>
+        <h2 class="piece__title">Sitting With It</h2>
+                  <p class="piece__words">Cross-legged, head tipped back, eyes shut. Not solving anything — just staying in the room.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="12" data-id="art-paper-garden"
+            style="--fog:0.86; --fx:32%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1085 / 1450">
+        <img class="piece__image"
+             src="artwork/paper-garden.webp"
+             alt="Paper Garden"
+             width="1085" height="1450"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open Paper Garden"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">XIII</span>
+        <h2 class="piece__title">Paper Garden</h2>
+                  <p class="piece__words">Leaves with corners on them. Cut and folded rather than grown, and none of it needs watering.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="13" data-id="art-what-the-hands-remember"
+            style="--fog:0.96; --fx:23%; --fy:39%">
+      <div class="piece__frame" style="aspect-ratio: 1024 / 1536">
+        <img class="piece__image"
+             src="artwork/what-the-hands-remember.webp"
+             alt="What the Hands Remember"
+             width="1024" height="1536"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open What the Hands Remember"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">XIV</span>
+        <h2 class="piece__title">What the Hands Remember</h2>
+                  <p class="piece__words">Two hands with a spiral drawn into each palm. Whatever they held went round, and came back round.</p>
+                      </figcaption>
+    </figure>
+        <figure class="piece" data-index="14" data-id="art-sleeping-through-the-good-part"
+            style="--fog:0.79; --fx:76%; --fy:10%">
+      <div class="piece__frame" style="aspect-ratio: 1080 / 1439">
+        <img class="piece__image"
+             src="artwork/sleeping-through-the-good-part.webp"
+             alt="Sleeping Through the Good Part"
+             width="1080" height="1439"
+             loading="lazy"
+             decoding="async">
+        <canvas class="piece__glass" aria-hidden="true"></canvas>
+        <button type="button" class="piece__open"
+                aria-label="Open Sleeping Through the Good Part"></button>
+      </div>
+      <figcaption class="piece__caption">
+        <span class="piece__numeral" aria-hidden="true">XV</span>
+        <h2 class="piece__title">Sleeping Through the Good Part</h2>
+                  <p class="piece__words">Asleep in all that yellow, with the sunflower right there beside her, unseen.</p>
+                      </figcaption>
+    </figure>
+      </section>
+
+  <section class="statement">
+    <div class="statement__rule" aria-hidden="true"></div>
+          <p>These start as things I see with my eyes shut.</p>
+          <p>Some of them are tender and some of them are not, and I have given up sorting them into two piles. A dream never tells you which kind it is until you are already inside it.</p>
+          <p>Most are drawn in one line, without lifting, because that is how they arrive — all at once, or not at all.</p>
+      </section>
+</main>
+
+<footer class="colophon">
+  <p class="colophon__tally" id="tally" data-total="15"></p>
+    <p class="colophon__links">
+          <a href="mailto:twistedmock007@gmail.com">twistedmock007@gmail.com</a>
+        <span aria-hidden="true">·</span>          <a href="https://instagram.com/talesofn1ghtmares" rel="me noopener">
+        @talesofn1ghtmares      </a>
+      </p>
+    <p class="colophon__note">All works © Inam. Please do not reproduce without permission.</p>
+</footer>
+
+<!-- Filled in by the lightbox. Empty until something is opened. -->
+<div class="plate" id="plate" hidden>
+  <button type="button" class="plate__close" id="plateClose" aria-label="Close">&#215;</button>
+  <figure class="plate__body">
+    <div class="plate__frame">
+      <img class="plate__image" id="plateImage" alt="">
+      <canvas class="plate__glass" id="plateGlass" aria-hidden="true"></canvas>
+    </div>
+    <figcaption class="plate__caption">
+      <span class="plate__numeral" id="plateNumeral"></span>
+      <h2 class="plate__title" id="plateTitle"></h2>
+      <p class="plate__words" id="plateWords"></p>
+    </figcaption>
+  </figure>
+  <button type="button" class="plate__step plate__step--prev" id="platePrev" aria-label="Previous">&#8249;</button>
+  <button type="button" class="plate__step plate__step--next" id="plateNext" aria-label="Next">&#8250;</button>
+</div>
+
+<script src="assets/js/glass.js?v=1784404082" defer></script>
+</body>
+</html>
