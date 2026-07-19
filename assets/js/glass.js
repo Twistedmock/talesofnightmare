@@ -27,7 +27,9 @@
 
   var SEEN_KEY = 'glass.seen.v1';
   var HINT_KEY = 'glass.hinted.v1';
-  var FOG_KEY  = 'glass.fog.v1';
+  // v2: v1 holds phantom values written during start-up by an earlier
+  // version, so it cannot be trusted and is deliberately abandoned.
+  var FOG_KEY  = 'glass.fog.v2';
 
   // On by default — the fog is the point of the gallery. A visitor who turns
   // it off keeps it off.
@@ -498,7 +500,14 @@
    * somebody's drawings — a first-time visitor should see the work, decide
    * they like it, and only then be offered the trick.
    */
-  function applyFog(on, btn) {
+  /**
+   * @param persist  Only true when the visitor actually operated the toggle.
+   *   This used to save on every call, including the one during start-up — so
+   *   the stored value recorded whatever the site had defaulted to that week,
+   *   not a choice anyone made. Flipping the default then left every earlier
+   *   visitor pinned to the old behaviour by a preference they never set.
+   */
+  function applyFog(on, btn, persist) {
     fogOn = on;
     root.classList.toggle('glass-on', on);
     root.classList.toggle('no-glass', !on);
@@ -515,7 +524,9 @@
     if (!on) {
       document.querySelectorAll('.piece').forEach(function (f) { f.classList.add('is-cleared'); });
     }
-    try { localStorage.setItem(FOG_KEY, on ? '1' : '0'); } catch (e) {}
+    if (persist) {
+      try { localStorage.setItem(FOG_KEY, on ? '1' : '0'); } catch (e) {}
+    }
   }
 
   function toggle() {
@@ -531,7 +542,7 @@
       // Turning fog *on* is a request to see it, so the prompt stays. Turning
       // it off means they are done with it.
       if (fogOn) dismissPrompt();
-      applyFog(!fogOn, btn);
+      applyFog(!fogOn, btn, true);
       btn.classList.add('is-known');
       try { localStorage.setItem(TOUCHED_KEY, '1'); } catch (e) {}
     });
@@ -580,7 +591,7 @@
 
     // The fog is the enhancement. If it cannot run, the art stays visible.
     if (reduced) {
-      applyFog(false, toggleBtn);
+      applyFog(false, toggleBtn, false);
       reveal();
       document.querySelectorAll('.piece').forEach(function (f) {
         f.classList.add('is-visible', 'is-cleared');
@@ -595,7 +606,7 @@
     // it stays clear until asked for.
     var stored = null;
     try { stored = localStorage.getItem(FOG_KEY); } catch (e) {}
-    applyFog(stored === null ? true : stored === '1', toggleBtn);
+    applyFog(stored === null ? true : stored === '1', toggleBtn, false);
 
     setupPrompt();
     observe();
