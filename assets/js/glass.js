@@ -18,11 +18,33 @@
     maskWidth:   112,   // fog resolution — low on purpose, it upscales soft
     viewMax:     760,   // cap on the sharp-layer canvas
     fps:         30,
-    refog:       0.0052, // alpha removed from the mask each tick
+
+    /* The fog comes back by taking a share of the mask's alpha away, which is
+       a multiplication — and the mask holds eight-bit alpha, so once a share
+       of what is left rounds to under half a unit, nothing changes and the
+       decay simply stops. Applied every tick at 0.0052 that floor sat at 96 of
+       255: a wiped pane settled around two-fifths clear and stayed there for
+       as long as the page was open. The fog has never once closed over.
+
+       Same decay rate, delivered in doses big enough to survive the rounding —
+       every fifth tick, six times a second, which on a mask this soft is not
+       a step you can see. Clarity now halves in about 2.5s and bottoms out
+       near 11 of 255 rather than 96. */
+    refogEvery:  5,
+    refogStep:   0.0448,
     wipeRadius:  0.14,  // fraction of the pane's smaller side
-    dropChance:  0.014, // per tick, per pane
+    // Per tick, per pane. At 0.014 — some twenty-five a minute, three of them
+    // falling at once — the run-off was not an occasional glimpse but a leak:
+    // a wiped pane settled at about a fifth clear and stayed there, so the fog
+    // never actually closed over and the piece you wiped a minute ago looked
+    // like the one you wiped a moment ago. Rarer, and a drop is an event.
+    dropChance:  0.0045,
+    maxDrops:    2,
     clearedAt:   2.6,   // accumulated wipe "work" that counts as looked-at
-    plateRefog:  0.0042 // the lightbox fogs more slowly, but it does fog
+    // The lightbox still fogs more slowly, and on the same cadence for the
+    // same reason. You went in to look closely, and taking that away at the
+    // wall's rate is impatience rather than atmosphere.
+    plateRefog:  0.0296
   };
 
   var SEEN_KEY = 'glass.seen.v1';
@@ -114,6 +136,7 @@
     this.mctx = this.mask.getContext('2d');
     this.drops = [];
     this.work = 0;
+    this.age = 0;          // ticks since the last fog pass
     this.cleared = false;
     this.active = false;
     this.ready = false;
@@ -192,15 +215,18 @@
     var m = this.mask, mc = this.mctx;
     if (!m.width) return;
 
-    // Fog creeping back.
-    mc.globalCompositeOperation = 'destination-out';
-    mc.fillStyle = 'rgba(0,0,0,' + CFG.refog + ')';
-    mc.fillRect(0, 0, m.width, m.height);
-    this.dirty = true;
+    // Fog creeping back, in doses — see CFG.refogEvery.
+    this.age = (this.age + 1) % CFG.refogEvery;
+    if (this.age === 0) {
+      mc.globalCompositeOperation = 'destination-out';
+      mc.fillStyle = 'rgba(0,0,0,' + CFG.refogStep + ')';
+      mc.fillRect(0, 0, m.width, m.height);
+      this.dirty = true;
+    }
 
     // Run-off. Droplets clear a narrow trail on their way down, which means
     // the gallery keeps offering glimpses even when nobody touches it.
-    if (this.drops.length < 3 && Math.random() < CFG.dropChance) {
+    if (this.drops.length < CFG.maxDrops && Math.random() < CFG.dropChance) {
       this.drops.push({
         x: Math.random(),
         y: -0.05,
@@ -299,6 +325,26 @@
   }
 
   /* ------------------------------------------------- visibility + the loop */
+
+  /* The lamp. A separate observer from the one below on purpose: that one runs
+     generous margins so a pane is warmed up before you reach it, which is
+     exactly wrong for light. A lamp should come up as the work reaches the
+     middle of the room and go out once it is behind you, so this one pulls the
+     root in by a fifth top and bottom and watches the middle band only. */
+  function lamps() {
+    var figures = document.querySelectorAll('.piece');
+    if (!('IntersectionObserver' in window)) {
+      figures.forEach(function (f) { f.classList.add('is-lit'); });
+      return;
+    }
+    var lit = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        entry.target.classList.toggle('is-lit', entry.isIntersecting);
+      });
+    }, { rootMargin: '-20% 0px -20% 0px', threshold: 0 });
+
+    figures.forEach(function (f) { lit.observe(f); });
+  }
 
   function observe() {
     if (!('IntersectionObserver' in window)) {
@@ -461,6 +507,9 @@
     tickPane: function () {
       var p = this.pane;
       if (!p || !p.ready || !p.mask.width) return;
+      // Same dosing as the wall, and for the same rounding reason.
+      p.age = (p.age + 1) % CFG.refogEvery;
+      if (p.age !== 0) return;
       var m = p.mask, mc = p.mctx;
       var cx = m.width / 2, cy = m.height / 2;
 
@@ -633,6 +682,7 @@
 
     setupPrompt();
     observe();
+    lamps();
     requestAnimationFrame(loop);
 
     var resizeTimer;

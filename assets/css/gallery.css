@@ -37,9 +37,12 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   margin: 0;
   min-height: 100vh;
+  /* Held down since the pieces carry their own light: an evenly lit room gives
+     the lamps nothing to come up out of. The top glow stays — it is the light
+     over the door, and the masthead reads by it. */
   background:
-    radial-gradient(120% 80% at 50% -10%, var(--ground-lit) 0%, transparent 60%),
-    radial-gradient(90% 60% at 50% 108%, #0d1119 0%, transparent 55%),
+    radial-gradient(115% 62% at 50% -14%, var(--ground-lit) 0%, transparent 62%),
+    radial-gradient(90% 55% at 50% 110%, #0b0e15 0%, transparent 58%),
     var(--ground);
   background-attachment: fixed;
   color: var(--text);
@@ -296,11 +299,49 @@ main { position: relative; z-index: 10; }
    fifth of the screen and was enough to stop the frames honouring their
    aspect ratio. */
 .piece {
+  position: relative;
   width: fit-content;
   max-width: 100%;
   margin: 0 auto clamp(7rem, 17vh, 15rem);
 }
 .piece:last-child { margin-bottom: 0; }
+
+/* One lamp, and it only lights what you are looking at.
+
+   The room used to be evenly lit, which is a room nobody is standing in. Each
+   piece now carries its own pool of light that comes up as it reaches the
+   middle of the view and goes out behind you, so the wall you have already
+   walked past is dark. Nothing here stays lit.
+
+   Lit is the default and .js-reveal switches it to follow, which is the same
+   bargain the reveal makes: with the script blocked, or the failsafe fired, or
+   motion turned down, every lamp is simply on. A gallery whose lights depend
+   on JavaScript is a dark room. */
+/* The pool is far wider than the picture on purpose. A lamp sized to the frame
+   puts its whole core behind an opaque drawing and spills only the tail of the
+   falloff onto the wall, which measured at about one value in 255 — light you
+   cannot see is not light. Widened so the frame edge sits mid-gradient and
+   there is something left to fall off. */
+.piece::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: -52% -46%;
+  pointer-events: none;
+  background: radial-gradient(58% 52% at 50% 46%,
+    rgba(164, 188, 224, 0.20) 0%,
+    rgba(142, 168, 206, 0.155) 34%,
+    rgba(104, 128, 166, 0.09) 57%,
+    rgba(62, 78, 106, 0.032) 79%,
+    transparent 100%);
+  transition: opacity 2.4s var(--ease);
+}
+.js-reveal .piece::before { opacity: 0; }
+.js-reveal .piece.is-lit::before { opacity: 1; }
+
+/* Above the light, not in it. */
+.piece__frame { z-index: 1; }
+.piece__caption { position: relative; z-index: 1; }
 
 /* Bounded by height, so a whole piece and its label sit inside the viewport at
    once — which is the point of showing one at a time. The ratio comes from the
