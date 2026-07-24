@@ -564,6 +564,20 @@ main { position: relative; z-index: 10; }
 }
 .colophon p { margin: 0 0 1.1rem; }
 .colophon__links a { letter-spacing: 0.2em; }
+.colophon__ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  border-bottom: 0;                 /* the icon replaces the underline as the cue */
+}
+.colophon__ig .ig {
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+  transform: translateY(-0.02em);
+}
+.colophon__ig span { border-bottom: 1px solid transparent; transition: border-color .5s var(--ease); }
+.colophon__ig:hover span { border-bottom-color: var(--sorrow-dim); }
 .colophon__tally {
   font-family: var(--serif);
   font-size: 0.95rem;

@@ -180,8 +180,10 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
     <?php endif; ?>
     <?php if ($site['email'] && $site['instagram']): ?><span aria-hidden="true">·</span><?php endif; ?>
     <?php if ($site['instagram']): ?>
-      <a href="https://instagram.com/<?= e(ltrim($site['instagram'], '@')) ?>" rel="me noopener">
-        @<?= e(ltrim($site['instagram'], '@')) ?>
+      <a class="colophon__ig" href="https://instagram.com/<?= e(ltrim($site['instagram'], '@')) ?>" rel="me noopener">
+        <?php /* Inlined, not <img>, so the strokes inherit the link colour and its hover. */
+              echo file_get_contents(APP_ROOT . '/assets/instagram.svg'); ?>
+        <span>@<?= e(ltrim($site['instagram'], '@')) ?></span>
       </a>
     <?php endif; ?>
   </p>

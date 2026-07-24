@@ -7,3 +7,6 @@ Thumbs.db
 # Nothing is written at runtime, but a stray atomic-write temp file from an
 # earlier version of this site would look like content if it were committed.
 data/*.tmp
+
+# generated portfolio (rebuild with tools/portfolio.mjs)
+tools/*.pdf
