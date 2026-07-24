@@ -110,13 +110,13 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
     ?>
     <figure class="piece" data-index="<?= $i ?>" data-id="<?= e($art['id'] ?? (string) $i) ?>"
             style="--fog:<?= $fog ?>; --fx:<?= $fx ?>%; --fy:<?= $fy ?>%">
-      <div class="piece__frame" style="aspect-ratio: <?= $w ?> / <?= $h ?>">
+      <div class="piece__frame" style="--ar: <?= $w ?> / <?= $h ?>">
         <?php
-          // A piece is drawn at ~92vw on a phone and at most ~720px on a wide
-          // screen, so most visitors only ever need the 800px file. Serving the
-          // master to everyone was costing about 57% more bytes than necessary.
+          // A piece is drawn at ~92vw on a phone. On a wide screen it is bounded
+          // by height rather than width, which sizes cannot express, so this is
+          // the widest it can get: a square piece at the 900px height cap.
           $srcset = image_variants((string) $art['src']);
-          $sizes  = '(max-width: 900px) 92vw, (max-width: 1600px) 46vw, 720px';
+          $sizes  = '(max-width: 900px) 92vw, 900px';
         ?>
         <picture>
           <?php if ($srcset['avif']): ?>

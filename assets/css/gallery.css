@@ -11,7 +11,10 @@
 
   --text:       #c2ccd9;
   --text-dim:   #7a8697;
-  --text-faint: #4a5464;
+  /* Was #4a5464 — 2.6:1 on this ground, and it carries every small label on
+     the page: the numerals, the tagline, the whole footer. At 9px that was
+     not quiet, it was gone. This clears 4.5:1. */
+  --text-faint: #707b8e;
 
   --edge:       rgba(163, 184, 210, 0.10);
   --edge-lit:   rgba(190, 210, 235, 0.20);
@@ -273,41 +276,42 @@ main { position: relative; z-index: 10; }
   padding: 0 clamp(1.25rem, 5vw, 5rem);
 }
 
-/* One piece to a row. These are small, quiet drawings — two of them side by
-   side made them compete, and the eye settled on neither. Each now gets the
-   full width, with its caption in the space opposite, and the side alternates
-   so the scroll has a rhythm instead of a column. */
+/* One piece to a row, hung centre, with its numeral and title set directly
+   underneath and flush with the left edge of the picture — a wall label.
+
+   This replaced a two-column spread that put the caption opposite the work.
+   That layout was drawn around a paragraph per piece; once the captions went,
+   it was holding a numeral and a title — some eighty pixels of type — in a
+   column six hundred wide, a hundred and seventy pixels from the picture they
+   named. Under a label the same emptiness reads as margin rather than as a
+   gap, and the drawings get the width back.
+
+   The figure shrink-wraps its picture (width: fit-content) so the label has a
+   left edge to align to. The caption is kept out of that measurement with
+   width: 0 — it fills the resolved width through min-width instead, so a long
+   title can never widen the row and pull the picture off centre.
+
+   The side margins reset here are the browser's own default for <figure> —
+   40px each. Left in, they took 80px off every row, which on a phone is a
+   fifth of the screen and was enough to stop the frames honouring their
+   aspect ratio. */
 .piece {
-  display: grid;
-  grid-template-columns: 1.45fr 1fr;
-  align-items: center;
-  justify-items: center;
-  gap: clamp(2rem, 5vw, 5.5rem);
-  margin-bottom: clamp(7rem, 17vh, 15rem);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto clamp(7rem, 17vh, 15rem);
 }
 .piece:last-child { margin-bottom: 0; }
 
-/* Both elements pull to the outside of the spread: the picture to the outer
-   margin, the caption to the inner edge of its column so it sits beside the
-   work rather than drifting in the middle of empty space. */
-.piece__frame   { justify-self: start; }
-.piece__caption { justify-self: start; }
-
-.piece:nth-child(even) { grid-template-columns: 1fr 1.45fr; }
-.piece:nth-child(even) .piece__frame { order: 2; justify-self: end; }
-.piece:nth-child(even) .piece__caption { order: 1; justify-self: end; text-align: right; }
-
-/* Sized by height, not width, so a whole piece and its caption sit inside the
-   viewport at once — which is the point of showing one at a time. */
+/* Bounded by height, so a whole piece and its label sit inside the viewport at
+   once — which is the point of showing one at a time. The ratio comes from the
+   artwork's own dimensions, so the box is reserved before a byte of the image
+   has arrived and nothing shifts as the wall loads. */
 .piece__frame {
   position: relative;
   overflow: hidden;
   background: var(--ink);
-  /* A definite height, not max-height: the image inside is absolutely
-     positioned, so the frame has no content to size itself from, and
-     aspect-ratio needs one real dimension to resolve the other against.
-     With max-height the frame collapsed to zero width. */
-  height: min(74vh, 720px);
+  aspect-ratio: var(--ar);
+  height: min(80vh, 900px);
   width: auto;
   max-width: 100%;
   box-shadow:
@@ -391,10 +395,17 @@ main { position: relative; z-index: 10; }
 }
 .glass-on .piece__frame::after { opacity: 1; }
 
+/* `contain`, not `cover`. The frame is height-driven, so on any viewport where
+   max-width bites first the box stops matching the artwork's ratio — and cover
+   answered that by cutting the drawing down to fill it, up to 40% of the width
+   away on a phone. Contain would rather letterbox against the ink than crop a
+   work. In practice neither happens now: nothing here is wider than square, so
+   the height is what binds on a desktop, and the phone rules below drive by
+   width instead. This is the guard, not the mechanism. */
 .piece__image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   position: absolute;
   inset: 0;
   transition: filter 1.1s var(--ease), transform 1.1s var(--ease);
@@ -403,9 +414,15 @@ main { position: relative; z-index: 10; }
 /* Fogged state. Only applied once the glass engine is running, so that with
    JavaScript off the work is simply visible — which is the point of a gallery.
    The blur suggests the shape behind; the veil above supplies the milkiness. */
+/* Drained, but not to nothing. At saturate(0.2) brightness(0.4) the wall
+   before you touched it was fifteen near-black rectangles — the differential
+   was there, but the state you actually land on had no colour left in it to
+   want. Held here, enough of the paper and the cobalt survives the fog to be
+   worth walking up to, and the wipe reads as a piece arriving rather than as
+   one being rescued. */
 .glass-on .piece__image {
-  filter: blur(13px) saturate(0.2) brightness(0.4) contrast(1.02);
-  transform: scale(1.07);
+  filter: blur(12px) saturate(0.5) brightness(0.62) contrast(1.02);
+  transform: scale(1.06);
 }
 
 .piece__glass {
@@ -478,21 +495,28 @@ main { position: relative; z-index: 10; }
 
 /* ------------------------------------------------------------- the caption */
 
+/* width: 0 keeps the label out of the row's shrink-wrap, so a long title can
+   never widen the row and pull the picture off centre; min-width puts it back
+   to whatever width the picture settled on, which is what makes the two flush.
+   Neither line is decorative — see .piece above. */
 .piece__caption {
-  margin: 0;
-  max-width: 34ch;
+  width: 0;
+  min-width: 100%;
+  margin: clamp(1.15rem, 2vw, 1.6rem) 0 0;
   opacity: 0.62;
   transition: opacity 1.4s var(--ease);
 }
 .piece.is-cleared .piece__caption,
 .no-glass .piece__caption { opacity: 1; }
 
+/* With the captions gone this is the only thing left beside the title, so it
+   has to be readable rather than merely present. */
 .piece__numeral {
   display: block;
   font-family: var(--sans);
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   letter-spacing: 0.34em;
-  color: #5d6879;
+  color: var(--text-faint);
   margin-bottom: 0.75rem;
 }
 
@@ -530,8 +554,13 @@ main { position: relative; z-index: 10; }
 
 /* ------------------------------------------------------------- statement */
 
+/* The measure has to be stated net of the padding. Under border-box a bare
+   max-width: 46ch was 46ch *including* two 5rem gutters, which left a 240px
+   column — about thirty characters a line, and the only real prose on the
+   site set like a newspaper column. */
 .statement {
-  max-width: 46ch;
+  --measure: 33rem;
+  max-width: calc(var(--measure) + 2 * clamp(1.25rem, 5vw, 5rem));
   margin: clamp(9rem, 22vw, 20rem) auto 0;
   padding: 0 clamp(1.25rem, 5vw, 5rem);
   font-size: clamp(1.02rem, 1.7vw, 1.2rem);
@@ -685,19 +714,18 @@ main { position: relative; z-index: 10; }
   .hang {
     margin-top: clamp(3.5rem, 14vw, 7rem);
   }
-  .piece,
-  .piece:nth-child(even) {
-    grid-template-columns: 1fr;
-    gap: 1.75rem;
-    margin-bottom: clamp(5rem, 12vh, 9rem);
-  }
-  .piece:nth-child(even) .piece__frame { order: 1; }
-  .piece:nth-child(even) .piece__caption { order: 2; text-align: left; }
-  .piece__frame { height: min(62vh, 560px); }
-  .piece__frame,
-  .piece:nth-child(even) .piece__frame { justify-self: start; }
-  .piece__caption,
-  .piece:nth-child(even) .piece__caption { max-width: none; justify-self: start; }
+  /* On a phone the width is the binding limit, not the height, so the frame is
+     driven from the width and lets the ratio give it a height. A tall piece is
+     better running past the fold than shrunk to clear it.
+
+     The row gives up fit-content to do it. A child asking for width: 100% of a
+     parent that is itself sizing to that child is circular — the percentage
+     contributes nothing to the intrinsic width, the row collapses to the width
+     of its title, and the picture disappears altogether. Full-bleed rows do
+     not need the shrink-wrap anyway: the label is flush with the picture
+     because both simply fill the column. */
+  .piece { width: auto; margin-bottom: clamp(5rem, 12vh, 9rem); }
+  .piece__frame { height: auto; width: 100%; }
   .rail { display: none; }
   .masthead { flex-direction: column; gap: 1.5rem; }
   .plate__step { font-size: 2rem; padding: .6rem; }
