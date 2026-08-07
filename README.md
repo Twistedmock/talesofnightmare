@@ -202,7 +202,52 @@ back. Dark artwork would want the opposite. Tuning is at the top of
 
 ---
 
-## 5. Notes for other servers
+## 5. The weather
+
+Every visit gets a different one — **rain, snow, mist, sun, wind, ash** — never
+the same one twice running. The **weather** control next to the glass toggle
+pins one, or takes it off with *nothing*; *whatever comes* puts it back to
+random. Choosing the weather you are already in draws a different instrument.
+
+Each weather is two canvases, a far one behind the work and a near one in front
+of it, plus a retint of the ground and of the lamp over each piece. The near
+layer never goes above a tenth of an opacity, so it cannot dirty a drawing.
+
+**The sound is on by default.** No browser will start audio without a gesture,
+so it begins on the first thing the visitor touches — which on this site is the
+tap that lifts the veil. Pressing **silence** is remembered; nothing plays for
+that visitor again.
+
+Nothing is a recording. Every sample is generated in the browser, in six layers
+on clocks that never line up, so it does not repeat:
+
+| Layer | What it is |
+|---|---|
+| beds | filtered noise — the hiss of rain, the hush under snow, wind sweeping |
+| drone | a low pedal that never moves |
+| pad | a held minor chord that shifts to a neighbour once a minute, over 20s |
+| drips | water off a sill, ice settling, a rope creaking, embers going out |
+| instrument | one of ten, drawn fresh each visit from those that suit the weather |
+| distance | an owl, a stone down a mountainside, a far thin sound, a low swell |
+
+The ten instruments are shakuhachi, temple bell and koto (japan), cedar flute
+(north america), duduk (armenia), bansuri (india), guqin (china), kalimba (east
+africa), gong (java) and glass (europe). Whichever arrived is named under the
+controls for a few seconds.
+
+Everything is tuned in one table at the top of `assets/js/weather.js` — one
+entry per weather for what falls and what it sounds like, and one per
+instrument for how it is built. To drop a weather entirely, remove it from
+`ORDER` there **and** from `ALL` in `assets/js/boot.js`, which picks the weather
+before the first paint so the palette never flashes.
+
+`prefers-reduced-motion` keeps the colour and the sound and drops the canvases.
+With the script blocked there is no weather and no controls, and the gallery is
+exactly what it was.
+
+---
+
+## 6. Notes for other servers
 
 On Apache the included `.htaccess` files hide `data/` and `includes/`, stop
 anything in `artwork/` from executing, and set the security headers.
