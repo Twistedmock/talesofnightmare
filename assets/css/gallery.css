@@ -23,6 +23,18 @@
   --sorrow:     #a3675a;
   --sorrow-dim: #6d443a;
 
+  /* The pool of light each piece hangs in. Four separate colours rather than
+     one at four alphas: the light cools as it falls away from the work, which
+     is what a real lamp on a dark wall does. Kept as bare `r g b` triples so
+     the weather can retint the room without restating five gradient stops. */
+  --lamp-1: 164 188 224;
+  --lamp-2: 142 168 206;
+  --lamp-3: 104 128 166;
+  --lamp-4: 62 78 106;
+
+  /* The weather's colour on the room. Overridden per weather below. */
+  --cast: none;
+
   --serif: 'Cormorant Garamond', Cormorant, Garamond, 'Hoefler Text', 'Times New Roman', serif;
   --sans:  ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
@@ -62,6 +74,95 @@ a { color: var(--text-dim); text-decoration: none; border-bottom: 1px solid tran
 a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
 
 :focus-visible { outline: 1px solid var(--sorrow); outline-offset: 4px; }
+
+/* ==========================================================================
+   The weather.
+
+   Four layers over the ground, in this order: the colour the weather puts on
+   the room, the far sky, the work itself, and the near sky — the handful of
+   large out-of-focus flakes that pass between you and the wall. Only the near
+   layer is ever allowed in front of a drawing, and only at an opacity you have
+   to go looking for.
+
+   .is-turning takes all of it down for a beat while the palette is swapped, so
+   the room changes weather rather than cutting to a different one.
+   ========================================================================== */
+
+.cast,
+.weather {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 1.2s var(--ease);
+}
+.is-turning .cast,
+.is-turning .weather { opacity: 0; }
+
+.cast          { z-index: 4;  background: var(--cast); }
+.weather--far  { z-index: 5; }
+/* Above the masthead too. Something falling in the foreground that stops dead
+   at the edge of a button is a thing on a screen, not a thing in a room. */
+.weather--near { z-index: 55; }
+
+/* --- what each weather does to the room ---------------------------------- */
+
+/* The changes are small on purpose. This is the light in a room changing, not
+   a theme switcher — the site has to still be recognisably itself in all six.
+   The ground moves by a few values, the lamp changes temperature, and the cast
+   does the rest. */
+
+[data-weather="rain"] {
+  --ground: #080b11; --ground-lit: #0e151f; --ink: #04060a;
+  --lamp-1: 150 180 222; --lamp-2: 128 160 204; --lamp-3: 92 120 164; --lamp-4: 54 72 104;
+  --cast: linear-gradient(180deg, rgba(96,132,178,0.085) 0%, rgba(70,98,138,0.03) 34%, transparent 62%);
+}
+
+[data-weather="snow"] {
+  /* Snow lifts the blacks — light scatters off it and there is no true dark
+     in a room with snow outside the window. */
+  --ground: #0c1017; --ground-lit: #171d28; --ink: #070a10;
+  --edge: rgba(186, 205, 230, 0.13);
+  --lamp-1: 196 216 244; --lamp-2: 170 194 226; --lamp-3: 126 152 190; --lamp-4: 74 92 122;
+  --cast: radial-gradient(120% 78% at 50% 0%, rgba(178,202,232,0.10) 0%, rgba(136,162,196,0.04) 45%, transparent 78%);
+}
+
+[data-weather="mist"] {
+  /* The flattest of the six. Contrast is the first thing fog takes. */
+  --ground: #0b0e15; --ground-lit: #141a24; --ink: #070911;
+  --text: #b4bdc9; --text-dim: #75808f;
+  --lamp-1: 158 176 202; --lamp-2: 138 156 182; --lamp-3: 104 120 146; --lamp-4: 62 74 94;
+  --cast: radial-gradient(130% 90% at 50% 46%, rgba(150,166,190,0.085) 0%, rgba(118,134,158,0.055) 55%, rgba(96,110,132,0.075) 100%);
+}
+
+[data-weather="sun"] {
+  /* A shaft through a window into a room nobody is in. The warmth is the
+     point and so is the emptiness — the two are the same observation. */
+  --ground: #0c0b0d; --ground-lit: #1a1714; --ink: #070607;
+  --sorrow: #b8785f; --sorrow-dim: #7c4c39;
+  --lamp-1: 226 196 158; --lamp-2: 198 168 134; --lamp-3: 148 122 96; --lamp-4: 86 70 56;
+  --cast:
+    linear-gradient(153deg, rgba(255,214,152,0.115) 0%, rgba(252,203,140,0.05) 20%, transparent 44%),
+    radial-gradient(90% 60% at 84% 100%, rgba(60,44,32,0.16) 0%, transparent 60%);
+}
+
+[data-weather="wind"] {
+  --ground: #090c11; --ground-lit: #10161e; --ink: #05070b;
+  --lamp-1: 172 192 220; --lamp-2: 148 170 200; --lamp-3: 108 128 158; --lamp-4: 64 78 100;
+  --cast: linear-gradient(102deg, rgba(150,176,208,0.075) 0%, transparent 38%, transparent 72%, rgba(112,138,172,0.05) 100%);
+}
+
+[data-weather="ash"] {
+  /* Warm-dark rather than warm. Something has already burned. */
+  --ground: #0b0a0a; --ground-lit: #191513; --ink: #060505;
+  --sorrow: #b06a54; --sorrow-dim: #74412f;
+  --lamp-1: 202 180 164; --lamp-2: 176 154 138; --lamp-3: 130 110 98; --lamp-4: 78 64 56;
+  --cast:
+    radial-gradient(110% 70% at 50% 108%, rgba(146,84,54,0.10) 0%, transparent 58%),
+    linear-gradient(180deg, rgba(28,22,20,0.30) 0%, transparent 40%);
+}
 
 /* Film grain over the whole page. Kills the flatness of large dark fields. */
 .grain {
@@ -170,6 +271,40 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   color: var(--text-faint);
 }
 
+/* The three controls all wear the same pill. They sit together at the top
+   right and wrap onto their own line before the masthead ever squeezes the
+   artist's name. */
+.masthead__controls {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+/* The instrument's name, for a few seconds after it is drawn. Taken out of
+   the flow entirely: appearing must not be able to move the masthead. */
+.sounding {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  right: 0;
+  margin: 0;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 1.4s var(--ease), transform 1.4s var(--ease);
+}
+.sounding.is-on { opacity: 1; transform: none; }
+
+.pill,
 .glass-toggle {
   flex-shrink: 0;
   display: inline-flex;
@@ -178,9 +313,6 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   justify-content: center;
   gap: 0.6rem;
   padding: 0.62rem 1.05rem;
-  /* Wide enough for the longer of the two labels, so swapping them cannot
-     resize the button underneath the cursor. */
-  min-width: 12.4rem;
   background: transparent;
   border: 1px solid var(--edge-lit);
   border-radius: 2rem;
@@ -193,6 +325,12 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   transition: color .6s var(--ease), border-color .6s var(--ease),
               background .6s var(--ease), box-shadow .6s var(--ease);
 }
+.glass-toggle {
+  /* Wide enough for the longer of the two labels, so swapping them cannot
+     resize the button underneath the cursor. */
+  min-width: 12.4rem;
+}
+.pill:hover,
 .glass-toggle:hover {
   color: #dbe3ee;
   border-color: var(--edge-lit);
@@ -243,6 +381,133 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   background: var(--sorrow);
   box-shadow: 0 0 12px 1px rgba(163,103,90,.45);
 }
+
+/* ------------------------------------------------- weather and sound */
+
+/* Both are built by weather.js and revealed only once it is running. A menu
+   of weathers with no script behind it is a control that lies. */
+.weather-pick,
+.sound-toggle { display: none; }
+.weather-ready .weather-pick { display: inline-block; position: relative; }
+.weather-ready .sound-toggle { display: inline-flex; }
+
+.weather-pick__button { min-width: 8.6rem; }
+/* The chevron. Two borders on a rotated square is the smallest honest way to
+   draw one, and it inherits the button's colour for free. */
+.weather-pick__button::after {
+  content: '';
+  width: 5px; height: 5px;
+  margin-left: -0.1rem;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.55;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .45s var(--ease), opacity .45s var(--ease);
+}
+.weather-pick.is-open .weather-pick__button::after {
+  transform: translateY(1px) rotate(225deg);
+  opacity: 0.9;
+}
+
+/* Lit in the weather's own colour, which is the only place on the page any of
+   these six colours is named outright. */
+.weather-pick__dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  transition: background .9s var(--ease), box-shadow .9s var(--ease);
+}
+
+.weather-pick__menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 30;
+  min-width: 11.5rem;
+  padding: 0.45rem 0;
+  background: rgba(9, 12, 18, 0.93);
+  border: 1px solid var(--edge);
+  border-radius: 0.9rem;
+  box-shadow: 0 24px 60px -30px rgba(0,0,0,.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: menuIn .5s var(--ease);
+}
+.weather-pick__menu[hidden] { display: none; }
+
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Set in the page's own serif rather than the label sans — this is the one
+   control that is a list of words, and they should read like the rest of the
+   writing on the site. */
+.weather-pick__row {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding: 0.4rem 1.15rem 0.4rem 1.9rem;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  font-family: var(--serif);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color .35s var(--ease);
+}
+.weather-pick__row:hover { color: var(--text); }
+.weather-pick__row.is-chosen { color: var(--sorrow); }
+/* The mark sits in the padding rather than in the flow, so choosing something
+   cannot shift the words a pixel to the right. */
+.weather-pick__row.is-chosen::before {
+  content: '';
+  position: absolute;
+  left: 1.15rem;
+  width: 0.55rem;
+  height: 1px;
+  margin-top: 0.72em;
+  background: currentColor;
+}
+.weather-pick__row--auto,
+.weather-pick__row--none {
+  font-style: italic;
+  color: var(--text-faint);
+}
+.weather-pick__row--auto  { margin-bottom: 0.4rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--edge); }
+.weather-pick__row--none  { margin-top: 0.4rem;    padding-top: 0.6rem;    border-top: 1px solid var(--edge); }
+
+.sound-toggle { min-width: 8.2rem; }
+.sound-toggle__bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 11px;
+}
+.sound-toggle__bars i {
+  display: block;
+  width: 2px;
+  height: 3px;
+  background: var(--text-faint);
+  transition: background .6s var(--ease), height .6s var(--ease);
+}
+/* Slow enough to breathe. A bouncing meter would be the only impatient thing
+   on the page. */
+.sound-toggle.is-playing .sound-toggle__bars i {
+  background: #dbe6f4;
+  animation: heard 2.9s var(--ease) infinite;
+}
+.sound-toggle.is-playing .sound-toggle__bars i:nth-child(2) { animation-delay: .55s; }
+.sound-toggle.is-playing .sound-toggle__bars i:nth-child(3) { animation-delay: 1.15s; }
+
+@keyframes heard {
+  0%, 100% { height: 3px;  opacity: 0.45; }
+  50%      { height: 11px; opacity: 1; }
+}
+.sound-toggle__label { transition: opacity .22s var(--ease); }
 
 /* -------------------------------------------------------------- the rail */
 
@@ -329,10 +594,10 @@ main { position: relative; z-index: 10; }
   inset: -52% -46%;
   pointer-events: none;
   background: radial-gradient(58% 52% at 50% 46%,
-    rgba(164, 188, 224, 0.20) 0%,
-    rgba(142, 168, 206, 0.155) 34%,
-    rgba(104, 128, 166, 0.09) 57%,
-    rgba(62, 78, 106, 0.032) 79%,
+    rgb(var(--lamp-1) / 0.20) 0%,
+    rgb(var(--lamp-2) / 0.155) 34%,
+    rgb(var(--lamp-3) / 0.09) 57%,
+    rgb(var(--lamp-4) / 0.032) 79%,
     transparent 100%);
   transition: opacity 2.4s var(--ease);
 }
@@ -769,8 +1034,25 @@ main { position: relative; z-index: 10; }
   .piece__frame { height: auto; width: 100%; }
   .rail { display: none; }
   .masthead { flex-direction: column; gap: 1.5rem; }
+  /* The controls stop being a right-hand cluster and become a row under the
+     name, so the menu has to hang off the left edge instead. */
+  .masthead__controls { justify-content: flex-start; width: 100%; }
+  .weather-pick__menu { right: auto; left: 0; }
+  .sounding { right: auto; left: 0; }
   .plate__step { font-size: 2rem; padding: .6rem; }
   .plate__image { max-height: 54vh; }
+}
+
+@media (max-width: 620px) {
+  /* Three pills will not sit on one line here, and the glass toggle is the
+     one that has to stay whole. */
+  .glass-toggle { min-width: 0; flex: 1 1 100%; }
+  .weather-pick { flex: 1 1 auto; }
+  .weather-pick__button,
+  .sound-toggle { width: 100%; min-width: 0; }
+  /* Stacked, the menu opens over the button below it. Full width so that
+     reads as a panel that has opened rather than a box that has slipped. */
+  .weather-pick__menu { width: 100%; }
 }
 
 @media (max-width: 480px) {
@@ -786,6 +1068,12 @@ main { position: relative; z-index: 10; }
   .glass-on .glass-toggle:not(:hover) .glass-toggle__halo,
   .glass-on .glass-toggle .glass-toggle__dot { animation: none; }
   .glass-toggle__halo { opacity: 0; }
+
+  /* Nothing falls. The weather keeps its colour and its sound — a palette is
+     not motion, and neither is a drone — but the canvases are never even
+     created, so there is nothing here to switch off. */
+  .weather { display: none; }
+
   *, *::before, *::after {
     animation-duration: .001ms !important;
     animation-iteration-count: 1 !important;

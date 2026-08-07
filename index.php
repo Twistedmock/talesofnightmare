@@ -60,6 +60,13 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
   </div>
 </div>
 
+<!-- The weather. The room takes its colour from .cast, the far sky falls
+     behind the work, the near sky passes in front of it. boot.js has already
+     put data-weather on <html> by the time any of this paints. -->
+<div class="cast" aria-hidden="true"></div>
+<canvas class="weather weather--far" id="weatherFar" aria-hidden="true"></canvas>
+<canvas class="weather weather--near" id="weatherNear" aria-hidden="true"></canvas>
+
 <div class="grain" aria-hidden="true"></div>
 
 <header class="masthead">
@@ -73,18 +80,45 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
       <?php endif; ?>
     </div>
   </div>
-  <!-- The glass is on by default. The label carries a slow sweep of light
-       until the visitor has used it once, so nobody is stuck behind fog they
-       did not realise they could turn off. aria-pressed tracks "cleared". -->
-  <button type="button" class="glass-toggle" id="glassToggle"
-          aria-pressed="false" title="Show every piece without the glass">
-    <!-- The halo is a real element, not ::after, so the script can hand its
-         current opacity over to a transition when the glow stops. Killing a
-         CSS animation snaps the value; fading it needs something to hold. -->
-    <span class="glass-toggle__halo" aria-hidden="true"></span>
-    <span class="glass-toggle__dot" aria-hidden="true"></span>
-    <span class="glass-toggle__label">clear the glass</span>
-  </button>
+
+  <div class="masthead__controls">
+    <!-- The glass is on by default. The label carries a slow sweep of light
+         until the visitor has used it once, so nobody is stuck behind fog they
+         did not realise they could turn off. aria-pressed tracks "cleared". -->
+    <button type="button" class="glass-toggle" id="glassToggle"
+            aria-pressed="false" title="Show every piece without the glass">
+      <!-- The halo is a real element, not ::after, so the script can hand its
+           current opacity over to a transition when the glow stops. Killing a
+           CSS animation snaps the value; fading it needs something to hold. -->
+      <span class="glass-toggle__halo" aria-hidden="true"></span>
+      <span class="glass-toggle__dot" aria-hidden="true"></span>
+      <span class="glass-toggle__label">clear the glass</span>
+    </button>
+
+    <!-- The menu inside is filled in by weather.js, and the whole control
+         stays hidden until it has been. -->
+    <div class="weather-pick" id="weatherPick">
+      <button type="button" class="pill weather-pick__button" id="weatherButton"
+              aria-expanded="false" aria-haspopup="true">
+        <span class="weather-pick__dot" id="weatherDot" aria-hidden="true"></span>
+        <span class="weather-pick__label" id="weatherLabel">weather</span>
+      </button>
+      <div class="weather-pick__menu" id="weatherMenu" role="menu"
+           aria-label="Weather" hidden></div>
+    </div>
+
+    <button type="button" class="pill sound-toggle" id="soundToggle"
+            aria-pressed="false"
+            title="Hear the weather — a different instrument over it each time">
+      <span class="sound-toggle__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="sound-toggle__label">listen</span>
+    </button>
+
+    <!-- Names whatever instrument the weather drew this time, for a few
+         seconds. Out of the flow, so it cannot move the masthead when it
+         appears. -->
+    <p class="sounding" id="sounding" aria-live="polite"></p>
+  </div>
 </header>
 
 <!-- Fills as you descend. Cold, slow, and slightly reluctant. -->
@@ -210,5 +244,6 @@ $ogImage = $first ? absolute_url((string) $first['src'], (string) $site['siteUrl
 </div>
 
 <script src="<?= e(asset('assets/js/glass.js')) ?>" defer></script>
+<script src="<?= e(asset('assets/js/weather.js')) ?>" defer></script>
 </body>
 </html>
