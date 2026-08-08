@@ -87,7 +87,7 @@
           { kind: 'drop', gap: [5, 13], f: [820, 220], g: 0.075 }
         ],
         // Rain at night is the one that gets an owl.
-        distant: ['owl', 'owl', 'abyss', 'keen']
+        distant: ['owl', 'owl', 'wail', 'abyss', 'keen']
       }
     },
 
@@ -120,7 +120,7 @@
           { kind: 'tick', gap: [6, 16], f: [4200, 7000], g: 0.030 },
           { kind: 'drop', gap: [9, 22], f: [1100, 300], g: 0.070 }
         ],
-        distant: ['keen', 'abyss', 'stone', 'owl']
+        distant: ['owl', 'wail', 'keen', 'abyss', 'stone']
       }
     },
 
@@ -152,7 +152,7 @@
         ],
         // Mist gets all four. It is the emptiest of the six and the only one
         // where you cannot see far enough to know what made the sound.
-        distant: ['owl', 'abyss', 'keen', 'stone']
+        distant: ['owl', 'wail', 'curlew', 'abyss', 'keen', 'stone']
       }
     },
 
@@ -185,7 +185,7 @@
           { kind: 'creak', gap: [15, 34], f: [190, 360], g: 0.050 }
         ],
         // No owl in daylight. Stone, heat and distance — a desert, not a night.
-        distant: ['abyss', 'keen', 'stone', 'stone']
+        distant: ['curlew', 'curlew', 'abyss', 'keen', 'stone']
       }
     },
 
@@ -215,7 +215,7 @@
           { kind: 'creak', gap: [8, 20], f: [170, 340], g: 0.075 },
           { kind: 'tick', gap: [13, 30], f: [1800, 3400], g: 0.020 }
         ],
-        distant: ['keen', 'stone', 'abyss', 'owl']
+        distant: ['curlew', 'owl', 'keen', 'stone', 'abyss']
       }
     },
 
@@ -244,7 +244,7 @@
           { kind: 'crackle', gap: [4, 12], f: [600, 2200], g: 0.045 },
           { kind: 'drop', gap: [10, 24], f: [1000, 260], g: 0.070 }
         ],
-        distant: ['stone', 'abyss', 'keen', 'owl']
+        distant: ['scops', 'owl', 'stone', 'abyss', 'keen']
       }
     },
 
@@ -259,7 +259,7 @@
       sound: {
         beds: [{ type: 'lowpass', f: 150, q: 0.5, g: 0.016 }],
         drips: [{ kind: 'drop', gap: [9, 24], f: [1100, 260], g: 0.085 }],
-        distant: ['owl', 'abyss', 'keen', 'stone']
+        distant: ['owl', 'wail', 'scops', 'abyss', 'keen', 'stone']
       }
     }
   };
@@ -426,6 +426,26 @@
       attack: [2, 3.6], rel: [5, 9], g: 0.058,
       vib: [3.2, 0.004, 2], cut: [5, 2, 1.0], gap: [12, 26]
     }
+  };
+
+  /* The shape each cry moves through, as a function of how far into it you
+     are, returning a multiple of the bird's own pitch. */
+  var SHAPE = {
+    // Up into the note by a fraction, held, and released at the end.
+    hoot: function (x) {
+      return 0.965 + 0.055 * Math.sin(Math.min(1, x * 3.2) * 1.5708)
+                   - 0.075 * Math.pow(x, 3.5);
+    },
+    // Most of an octave of rise, a plateau, and then it is given up.
+    wail: function (x) {
+      if (x < 0.42) return 0.58 + 0.42 * Math.sin(x / 0.42 * 1.5708);
+      if (x < 0.72) return 1;
+      return 1 - 0.24 * Math.pow((x - 0.72) / 0.28, 1.6);
+    },
+    // One rise, easing as it goes, and no answer.
+    curlew: function (x) { return 0.5 + 0.5 * Math.pow(x, 0.65); },
+    // Barely moving at all.
+    peu: function (x) { return 1 + 0.012 * Math.sin(x * 3.1416) - 0.02 * Math.pow(x, 4); }
   };
 
   /* --------------------------------------------------------------- utils */
@@ -682,13 +702,30 @@
       this.master = ctx.createGain();
       this.master.gain.value = 0;
 
-      // Nothing here should ever be able to clip, whatever the weather does
-      // to the drone while a note is landing.
+      /* Nothing here should ever be able to clip, whatever the weather does
+         to the drone while a note is landing.
+
+         It was also leaving fifteen decibels of headroom unused — peaks
+         around a quarter of full scale and an average around a twentieth,
+         which on a laptop at ordinary volume is something you have to lean
+         towards. The compressor now catches only the peaks, and the makeup
+         after it lifts everything underneath by more than double. Louder
+         because the gap between the loudest and the average got smaller,
+         which is the only way to get louder without getting nearer to
+         clipping. */
       var comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = -18;
-      comp.ratio.value = 6;
+      comp.threshold.value = -14;
+      comp.knee.value = 8;
+      comp.ratio.value = 4;
+      comp.attack.value = 0.01;
+      comp.release.value = 0.3;
+
+      var makeup = ctx.createGain();
+      makeup.gain.value = 2.2;
+
       this.master.connect(comp);
-      comp.connect(ctx.destination);
+      comp.connect(makeup);
+      makeup.connect(ctx.destination);
 
       // One bus, split dry and wet. The room is deliberately enormous — seven
       // seconds of tail is what carries a note that has stopped through to the
@@ -1410,59 +1447,176 @@
       }, wait * 1000);
     },
 
-    /* A tawny owl, which is very nearly a pure sine — the reason owls are the
-       one bird worth synthesising. The phrase is the giveaway, not the tone:
-       one long note, then three or four seconds of nothing, then a short
-       catch and a long wavering fall. That pause is what makes it an owl and
-       not a flute, and it is also the loneliest three seconds available. */
-    owl: function () {
-      var t = this.ctx.currentTime + rand(0, 0.5);
-      var f = rand(300, 460);
-      var lv = rand(0.055, 0.105);
-      var pan = rand(-0.8, 0.8);
-      this.hoot(t, f, 0.55, false, lv, pan);
-      var again = t + rand(3, 4.4);
-      this.hoot(again, f * 0.985, 0.1, false, lv * 0.5, pan);
-      this.hoot(again + 0.17, f * 1.012, rand(0.85, 1.3), true, lv, pan);
-    },
+    /* ---------------------------------------------------------- the birds */
 
-    hoot: function (t, f, dur, wobble, level, pan) {
+    /* The old owl was a sine with a bit of second harmonic on it, and it
+       sounded like exactly that: a tone, not an animal. What was missing was
+       everything that is not the pitch — the shape the pitch moves in, the
+       resonance of the body it comes out of, and the air.
+
+       cry() supplies all three. The contour is a real curve rather than a
+       glide between two numbers, which is what setValueCurveAtTime is for and
+       what makes a wail rise the way a throat rises. A peaking filter above
+       the fundamental stands in for the body cavity. And there is breath
+       under it, because nothing alive makes a sound without moving air. */
+
+    cry: function (t, f, dur, shape, o) {
       var ctx = this.ctx;
+      o = o || {};
+      var level = o.level || 0.08;
+      var pan = o.pan === undefined ? rand(-0.8, 0.8) : o.pan;
+      var att = o.attack || dur * 0.18;
+      var rel = o.release || dur * 0.35;
+
       var g = ctx.createGain();
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(level, t + Math.min(0.1, dur * 0.3));
-      g.gain.setValueAtTime(level, t + dur * 0.7);
+      g.gain.linearRampToValueAtTime(level, t + att);
+      g.gain.setValueAtTime(level, t + Math.max(att + 0.01, dur - rel));
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
 
-      var o = ctx.createOscillator();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f * 1.03, t);
-      o.frequency.exponentialRampToValueAtTime(f, t + dur * 0.3);
-      o.frequency.exponentialRampToValueAtTime(f * 0.95, t + dur);
-      o.connect(g);
+      // The body it is coming out of.
+      var body = ctx.createBiquadFilter();
+      body.type = 'peaking';
+      body.frequency.value = (o.formant || 1.8) * f;
+      body.Q.value = 2.2;
+      body.gain.value = 8;
+      var soft = ctx.createBiquadFilter();
+      soft.type = 'lowpass';
+      soft.frequency.value = f * 6;
+      g.connect(body); body.connect(soft);
+      this.night(soft, pan);
 
-      // Just enough second harmonic to stop it being a test tone.
+      // The contour, sampled into a curve. A rise that eases is a throat; a
+      // rise that is a straight line between two frequencies is a slide
+      // whistle, and the ear knows the difference immediately.
+      var N = 64, curve = new Float32Array(N), harm = new Float32Array(N), i;
+      for (i = 0; i < N; i++) {
+        curve[i] = f * shape(i / (N - 1));
+        harm[i] = curve[i] * 2;
+      }
+
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.connect(g);
+      osc.frequency.setValueCurveAtTime(curve, t, dur);
+      osc.start(t); osc.stop(t + dur + 0.25);
+
       var h = ctx.createOscillator();
       var hg = ctx.createGain();
       h.type = 'sine';
-      h.frequency.value = f * 2;
-      hg.gain.value = 0.055;
+      hg.gain.value = o.harm === undefined ? 0.1 : o.harm;
+      h.frequency.setValueCurveAtTime(harm, t, dur);
       h.connect(hg); hg.connect(g);
+      h.start(t); h.stop(t + dur + 0.25);
 
-      // The tremolo arrives partway through the long note, never at its start.
-      if (wobble) {
+      // The quaver, arriving partway in. A bird does not start wavering; it
+      // wavers once it has been holding the note for a moment.
+      if (o.wobble) {
         var lfo = ctx.createOscillator();
         var d = ctx.createGain();
-        lfo.frequency.value = rand(10.5, 13);
+        lfo.frequency.value = o.wobble[0];
         d.gain.setValueAtTime(0, t);
-        d.gain.linearRampToValueAtTime(f * 0.014, t + dur * 0.45);
-        lfo.connect(d); d.connect(o.frequency);
-        lfo.start(t); lfo.stop(t + dur + 0.2);
+        d.gain.setValueAtTime(0, t + dur * o.wobble[2]);
+        d.gain.linearRampToValueAtTime(f * o.wobble[1],
+          t + dur * Math.min(0.95, o.wobble[2] + 0.3));
+        lfo.connect(d); d.connect(osc.frequency);
+        lfo.start(t); lfo.stop(t + dur + 0.25);
       }
 
-      this.afar(g, pan);
-      o.start(t); o.stop(t + dur + 0.2);
-      h.start(t); h.stop(t + dur + 0.2);
+      if (o.breath) {
+        var src = ctx.createBufferSource();
+        src.buffer = this.beds[0].src.buffer;
+        src.loop = true;
+        var bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = f * 2.4;
+        bp.Q.value = 1.6;
+        var bg = ctx.createGain();
+        bg.gain.setValueAtTime(0.0001, t);
+        bg.gain.linearRampToValueAtTime(level * o.breath, t + att);
+        bg.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        src.connect(bp); bp.connect(bg);
+        this.night(bg, pan);
+        src.start(t, Math.random() * (src.buffer.duration - 0.4));
+        src.stop(t + dur + 0.25);
+      }
+    },
+
+    /* Birds go out through the gulf like everything else distant, but with
+       rather more of them arriving dry. A bird buried in eleven seconds of
+       reverb and nothing else is a ghost; a bird you can place, with the
+       valley answering behind it, is a bird. */
+    night: function (node, pan) {
+      var ctx = this.ctx;
+      var dry = ctx.createGain();
+      dry.gain.value = 0.42;
+      if (ctx.createStereoPanner) {
+        var p = ctx.createStereoPanner();
+        p.pan.value = pan === undefined ? rand(-0.8, 0.8) : pan;
+        node.connect(p);
+        p.connect(dry); p.connect(this.gulf);
+      } else {
+        node.connect(dry); node.connect(this.gulf);
+      }
+      dry.connect(this.master);
+    },
+
+    /* A tawny owl. Up into the note, held, and let go of at the end — then
+       three or four seconds of nothing, a short catch, and a long wavering
+       fall. The pause is what makes it an owl rather than a flute, and it is
+       also the loneliest three seconds in the file. */
+    owl: function () {
+      var t = this.ctx.currentTime + rand(0, 0.5);
+      var f = rand(310, 430);
+      var lv = rand(0.075, 0.13);
+      var pan = rand(-0.75, 0.75);
+      this.cry(t, f, rand(0.6, 0.82), SHAPE.hoot,
+        { level: lv, pan: pan, breath: 0.5, formant: 1.9, attack: 0.12 });
+      var again = t + rand(3.2, 4.6);
+      this.cry(again, f * 0.985, 0.14, SHAPE.peu,
+        { level: lv * 0.5, pan: pan, breath: 0.4, formant: 1.9,
+          attack: 0.035, release: 0.08 });
+      this.cry(again + 0.21, f * 1.01, rand(1, 1.5), SHAPE.hoot,
+        { level: lv, pan: pan, breath: 0.55, formant: 1.9, attack: 0.14,
+          wobble: [6.5, 0.011, 0.35] });
+    },
+
+    /* A diver, somewhere out on the water. Rises most of an octave, holds at
+       the top, and gives it up. There is no more desolate sound made by
+       anything with a throat. */
+    wail: function () {
+      this.cry(this.ctx.currentTime, rand(620, 900), rand(2.4, 3.8), SHAPE.wail, {
+        level: rand(0.06, 0.10), breath: 0.3, formant: 1.5, harm: 0.16,
+        attack: 0.35, release: 0.9, wobble: [5.2, 0.007, 0.45]
+      });
+    },
+
+    /* A curlew: one long rise that never comes back down. Leaving it
+       unresolved is the whole of why people call it the loneliest sound on a
+       moor — it asks and does not answer. */
+    curlew: function () {
+      this.cry(this.ctx.currentTime, rand(1100, 1500), rand(1.1, 1.7), SHAPE.curlew, {
+        level: rand(0.045, 0.08), breath: 0.42, formant: 1.3, harm: 0.07,
+        attack: 0.16, release: 0.45, wobble: [11, 0.006, 0.72]
+      });
+    },
+
+    /* A scops owl: one soft note, then the same note again two or three
+       seconds later, four or five times over. Nothing else here is this
+       patient, and patience is most of what it sounds like. */
+    scops: function () {
+      var t = this.ctx.currentTime;
+      var f = rand(440, 620);
+      var lv = rand(0.05, 0.085);
+      var pan = rand(-0.6, 0.6);
+      var n = 3 + Math.floor(Math.random() * 4);
+      for (var i = 0; i < n; i++) {
+        this.cry(t, f * rand(0.995, 1.005), rand(0.22, 0.3), SHAPE.peu, {
+          level: lv * rand(0.8, 1), pan: pan, breath: 0.35, formant: 1.7,
+          attack: 0.05, release: 0.12
+        });
+        t += rand(2.1, 3.2);
+      }
     },
 
     /* A stone let go of on a mountainside: a handful of impacts, each quieter
