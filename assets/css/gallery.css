@@ -545,6 +545,23 @@ main { position: relative; z-index: 10; }
   max-width: 1360px;
   margin: clamp(4rem, 10vw, 9rem) auto 0;
   padding: 0 clamp(1.25rem, 5vw, 5rem);
+
+  /* The lamp on each piece spills 46% of the picture's width past either
+     side, which is the whole point of it — on a desktop that light lands on
+     the wall. On a phone the picture is very nearly the screen, so the spill
+     lands off it, and Chrome on mobile answers horizontal overflow by
+     widening the layout viewport to fit: a 390px phone laid out at 531px,
+     with the gallery centred in the left 390 of it and every drawing
+     therefore sitting left of centre. body { overflow-x: hidden } does not
+     help, because the viewport is widened before anything is clipped.
+
+     `clip` rather than `hidden`: hidden would make this a scroll container
+     and take the page's vertical scrolling with it. clip just stops the
+     overflow propagating, which is all that is wanted. The clip margin keeps
+     the desktop spill intact — it extends what is painted without putting
+     any of it back into the scrollable area. */
+  overflow-x: clip;
+  overflow-clip-margin: 30vw;
 }
 
 /* One piece to a row, hung centre, with its numeral and title set directly

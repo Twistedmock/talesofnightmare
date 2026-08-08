@@ -2030,27 +2030,56 @@
 
     /* ------------------------------------------------------------ sound */
 
-    function audible(yes) {
-      ui.sound.setAttribute('aria-pressed', yes ? 'true' : 'false');
-      ui.sound.classList.toggle('is-playing', yes);
-      ui.sound.querySelector('.sound-toggle__label').textContent = yes ? 'silence' : 'listen';
-      ui.sound.setAttribute('title', yes
-        ? 'Stop the sound'
-        : 'Hear the weather — a different instrument over it each time');
-      if (!yes && ui.sounding) ui.sounding.classList.remove('is-on');
+    /* ==================================================================
+       The sound control.
+
+       One flag, `muted`, and nothing but a click on this button ever changes
+       it. Everything else — the browser's autoplay policy, whether the
+       context has come up yet, how long resume() takes — is reported, not
+       consulted.
+
+       Three earlier versions of this inferred the button's action from
+       something observable instead: the label, then the audio graph, then the
+       label read at pointerdown. All three raced, and all three raced the
+       same way. Chrome resumes a context whose resume() it previously blocked
+       the moment any gesture happens, and the mousedown that presses this
+       button is such a gesture — so between the visitor deciding to press
+       "listen" and the handler running, the sound starts on its own and the
+       handler stops it again, writing the mute preference on the way past.
+       The result was a button that could not turn the sound on. It could only
+       ever turn it off, on every visit, permanently.
+
+       So the label states the intent, and the little bars state the fact. If
+       you see "silence" and the bars are still, the sound is meant to be
+       playing and the browser has not let it start yet — the next thing you
+       touch anywhere on the page will start it.
+       ================================================================== */
+
+    var muted = false;
+    try { muted = localStorage.getItem(SOUND_KEY) === '0'; } catch (e) {}
+
+    function paint() {
+      var live = !muted && Sound.live();
+      ui.sound.setAttribute('aria-pressed', muted ? 'false' : 'true');
+      ui.sound.querySelector('.sound-toggle__label').textContent =
+        muted ? 'listen' : 'silence';
+      ui.sound.setAttribute('title', muted
+        ? 'Hear the weather \u2014 a different pair of instruments each time'
+        : 'Stop the sound');
+      ui.sound.classList.toggle('is-playing', live);
+      if (muted && ui.sounding) ui.sounding.classList.remove('is-on');
     }
 
-    /* Two instruments, drawn from the handful that suit the weather, so the
-       pair is different on every visit. Named for a few seconds when they
-       arrive — long enough to be read, short enough not to become furniture.
-       The second is on its own line and set fainter, which is also where it
-       is in the mix. */
+    /* Two instruments, drawn from the eleven, so the pair is different on
+       every visit. Named for a few seconds when they arrive — long enough to
+       be read, short enough not to become furniture. The second is on its own
+       line and set fainter, which is also where it is in the mix. */
     var told;
     Sound.onvoice = function (lead, second) {
-      if (!Sound.on || !ui.sounding || !lead) return;
+      if (muted || !ui.sounding || !lead) return;
       ui.sounding.textContent = '';
       var a = document.createElement('span');
-      a.textContent = lead.name + ' · ' + lead.from;
+      a.textContent = lead.name + ' \u00b7 ' + lead.from;
       ui.sounding.appendChild(a);
       if (second) {
         var b = document.createElement('span');
@@ -2063,65 +2092,64 @@
       told = setTimeout(function () { ui.sounding.classList.remove('is-on'); }, 8000);
     };
 
+    /* Trying to start, and keeping an eye on whether it worked.
+     *
+     * The immediate attempt is the one that usually succeeds: Chrome allows
+     * an AudioContext outright on any origin the visitor has played sound on
+     * before, which after one visit is everybody who comes back. Only when
+     * that is refused does it fall back to waiting for something to happen.
+     *
+     * The fallback listens to more than the events that grant user
+     * activation. A wheel cannot start audio by itself, but trying on one
+     * costs nothing and the listeners do not stand down until the context is
+     * confirmed running, so nothing is ever spent on an event that could not
+     * have worked. pointermove is deliberately absent: it never granted
+     * activation, so it could only help visitors the immediate attempt
+     * already covers, and it fired while the cursor was travelling towards
+     * this very button. */
+    var GESTURES = ['pointerdown', 'pointerup', 'touchend', 'touchstart',
+                    'keydown', 'click', 'wheel', 'scroll'];
+    var listening = false, watch;
+
+    function stand(down) {
+      if (down === listening) return;
+      listening = down;
+      GESTURES.forEach(function (evt) {
+        if (down) window.addEventListener(evt, wake, { passive: true, capture: true });
+        else window.removeEventListener(evt, wake, { capture: true });
+      });
+    }
+
+    function wake(ev) {
+      // Never on this button. Its own handler owns what happens there.
+      if (ev && ev.target && ui.sound.contains(ev.target)) return;
+      if (muted || !Sound.start()) return;
+      chase();
+    }
+
+    /* resume() is a promise and how long it takes depends on the machine, so
+       this watches rather than checking once after a guessed delay. */
+    function chase() {
+      clearInterval(watch);
+      var tries = 0;
+      watch = setInterval(function () {
+        paint();
+        if (Sound.live()) { stand(false); clearInterval(watch); }
+        else if (++tries > 20) clearInterval(watch);   // keep listening
+      }, 140);
+    }
+
     ui.sound.addEventListener('click', function () {
-      var playing = ui.sound.getAttribute('aria-pressed') === 'true';
-      if (playing) { Sound.stop(); audible(false); }
-      else if (Sound.start()) { audible(true); }
-      try { localStorage.setItem(SOUND_KEY, playing ? '0' : '1'); } catch (e) {}
+      muted = !muted;
+      if (muted) { Sound.stop(); stand(false); clearInterval(watch); }
+      else { Sound.start(); stand(true); chase(); }
+      try { localStorage.setItem(SOUND_KEY, muted ? '0' : '1'); } catch (e) {}
+      paint();
     });
 
-    /* Sound is on unless the visitor has turned it off.
-     *
-     * This used to wait for a gesture on the grounds that no browser will
-     * start an AudioContext without one. That is not true, and the code
-     * never even tried: Chrome allows it outright on any origin the visitor
-     * has played sound on before, which after one visit is everybody who
-     * comes back. Waiting meant that a returning visitor with the sound
-     * switched on still had to click something before hearing anything, and
-     * clicking something to hear sound is indistinguishable from turning the
-     * sound on.
-     *
-     * So it tries immediately, and only falls back to waiting.
-     *
-     * The fallback listens to far more than the events that grant user
-     * activation. A wheel event cannot start audio on its own, but trying on
-     * one costs nothing and the listener does not stand down until the
-     * context is confirmed running — so nothing is ever spent on an event
-     * that could not have worked.
-     */
-    var GESTURES = ['pointerdown', 'pointerup', 'touchend', 'touchstart',
-                    'keydown', 'click', 'wheel', 'scroll', 'pointermove'];
-    var wanted = true;
-    try {
-      var saved = localStorage.getItem(SOUND_KEY);
-      if (saved !== null) wanted = saved === '1';
-    } catch (e) {}
+    paint();
+    if (!muted) { stand(true); wake(); }
 
-    if (wanted) {
-      var listening = false;
-
-      var stand = function (down) {
-        if (down === listening) return;
-        listening = down;
-        GESTURES.forEach(function (evt) {
-          if (down) window.addEventListener(evt, wake, { passive: true, capture: true });
-          else window.removeEventListener(evt, wake, { capture: true });
-        });
-      };
-
-      var wake = function () {
-        if (!Sound.start()) return;
-        // resume() is a promise, so the context is still suspended for a
-        // moment either way. Only believe it once it is actually running,
-        // and keep listening until then.
-        setTimeout(function () {
-          if (Sound.live()) { audible(true); stand(false); }
-        }, 350);
-      };
-
-      stand(true);
-      wake();                       // the try that usually works
-    }
 
     root.classList.add('weather-ready');
   }
