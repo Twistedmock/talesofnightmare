@@ -76,7 +76,7 @@
           { type: 'bandpass', f: 400,  q: 0.8, g: 0.048 }
         ],
         drone: { root: 55, stack: [1, 1.189, 1.5, 2], g: 0.050, cut: 340 },
-        pad: { root: 110, stack: [1, 1.189, 1.5, 2, 2.378], g: 0.030, cut: 900 },
+        pad: { root: 55, stack: [1, 1.189, 1.5, 2, 2.378], g: 0.022, cut: 400 },
         // Water off a sill, into something. The loneliest sound there is.
         drip: { kind: 'drop', gap: [2.2, 7], f: [1500, 380], g: 0.10 },
         // Rain at night is the one that gets an owl.
@@ -111,7 +111,7 @@
           { type: 'lowpass', f: 190, q: 0.6, g: 0.032, sway: [0.5, 1.4, 17] }
         ],
         drone: { root: 65.41, stack: [1, 1.189, 2, 2.378], g: 0.046, cut: 260 },
-        pad: { root: 130.81, stack: [1, 1.189, 1.5, 2.378, 3], g: 0.026, cut: 1100 },
+        pad: { root: 65.41, stack: [1, 1.189, 1.782, 2, 2.378], g: 0.019, cut: 440 },
         // Ice finding somewhere to settle.
         drip: { kind: 'tick', gap: [6, 16], f: [4200, 7000], g: 0.030 },
         distant: ['keen', 'abyss', 'stone'],
@@ -141,7 +141,7 @@
           { type: 'lowpass', f: 110, q: 0.7, g: 0.042, sway: [0.6, 1.3, 23] }
         ],
         drone: { root: 41.20, stack: [1, 1.5, 1.782, 2, 3], g: 0.085, cut: 200 },
-        pad: { root: 82.41, stack: [1, 1.189, 1.5, 2, 2.997], g: 0.034, cut: 620 },
+        pad: { root: 41.20, stack: [1, 1.5, 2, 2.378, 3], g: 0.026, cut: 320 },
         // Deeper and rarer than the rain's. This one is in a cave.
         drip: { kind: 'drop', gap: [5, 14], f: [900, 210], g: 0.115 },
         // Mist gets all four. It is the emptiest of the six and the only one
@@ -177,7 +177,7 @@
         ],
         // A major stack, but voiced so wide it never lands anywhere.
         drone: { root: 65.41, stack: [1, 1.5, 2.5, 3], g: 0.055, cut: 420 },
-        pad: { root: 130.81, stack: [1, 1.5, 2.5, 3, 3.75], g: 0.028, cut: 1300 },
+        pad: { root: 65.41, stack: [1, 1.5, 2, 2.5, 3], g: 0.020, cut: 480 },
         // A warm house ticking. Nobody in it.
         drip: { kind: 'tick', gap: [9, 22], f: [2600, 4200], g: 0.022 },
         // No owl in daylight. Stone, heat and distance — a desert, not a night.
@@ -209,7 +209,7 @@
           { type: 'lowpass',  f: 95,  q: 0.7, g: 0.048 }
         ],
         drone: { root: 49, stack: [1, 1.189, 1.5, 2.378], g: 0.048, cut: 300 },
-        pad: { root: 98, stack: [1, 1.189, 1.5, 2.378, 2.997], g: 0.028, cut: 800 },
+        pad: { root: 49, stack: [1, 1.189, 1.5, 2, 2.997], g: 0.020, cut: 380 },
         // Something wooden taking the strain and letting it go again.
         drip: { kind: 'creak', gap: [8, 20], f: [170, 340], g: 0.075 },
         distant: ['keen', 'keen', 'stone', 'abyss'],
@@ -239,7 +239,7 @@
           { type: 'bandpass', f: 88, q: 2.0, g: 0.044 }
         ],
         drone: { root: 43.65, stack: [1, 1.189, 1.414, 2], g: 0.078, cut: 220 },
-        pad: { root: 87.31, stack: [1, 1.189, 1.414, 2, 2.378], g: 0.032, cut: 700 },
+        pad: { root: 43.65, stack: [1, 1.189, 1.414, 2, 2.378], g: 0.024, cut: 340 },
         // What is left of a fire, going out.
         drip: { kind: 'crackle', gap: [4, 12], f: [600, 2200], g: 0.045 },
         distant: ['stone', 'abyss', 'keen', 'owl'],
@@ -259,7 +259,7 @@
       sound: {
         beds: [{ type: 'lowpass', f: 150, q: 0.5, g: 0.016 }],
         drone: { root: 48.99, stack: [1, 1.5, 2], g: 0.042, cut: 180 },
-        pad: { root: 98, stack: [1, 1.5, 2, 2.997], g: 0.024, cut: 560 },
+        pad: { root: 48.99, stack: [1, 1.5, 2, 2.997], g: 0.017, cut: 300 },
         drip: { kind: 'drop', gap: [9, 24], f: [1100, 260], g: 0.085 },
         distant: ['owl', 'abyss', 'keen', 'stone'],
         voices: ['bonsho', 'glass', 'guqin'],
@@ -391,8 +391,14 @@
       name: 'glass', from: 'europe',
       root: 440, scale: [0, 3, 7, 10], curve: 'bow',
       partials: [[1, 1], [2, 0.14], [3, 0.05]],
-      attack: [2, 3.6], rel: [7, 13], g: 0.062,
-      vib: [3.2, 0.005, 2], shimmer: 0.3, cut: [5, 2, 1.0], gap: [12, 26]
+      // No shimmer at all. Glass is the one instrument here that is genuinely
+      // a held pure tone, and a held pure tone with a second copy beating
+      // against it is the exact recipe this whole file had to be pulled back
+      // from. The length comes back to what it was, too — with seven seconds
+      // of reverb behind it an eleven-second glass note overlapped the next
+      // one and never stopped sounding.
+      attack: [2, 3.6], rel: [5, 9], g: 0.058,
+      vib: [3.2, 0.004, 2], cut: [5, 2, 1.0], gap: [12, 26]
     }
   };
 
@@ -665,8 +671,8 @@
       this.bus = ctx.createGain();
       this.dry = ctx.createGain();
       this.wet = ctx.createGain();
-      this.dry.gain.value = 0.60;
-      this.wet.gain.value = 0.80;
+      this.dry.gain.value = 0.66;
+      this.wet.gain.value = 0.66;
 
       var verb = ctx.createConvolver();
       verb.buffer = this.tail(7, 2);
@@ -719,16 +725,19 @@
         this.beds.push({ src: src, filter: filter, gain: gain, lfo: null, sweep: null });
       }
 
-      /* Two banks of held tone. The drone sits under everything at the bottom
-         of hearing, where it is felt rather than heard. The pad is two octaves
-         up, in the register sadness actually lives in — a low rumble is
-         weather, but a held minor chord at two hundred hertz is a mood, and it
-         is the thing that is *always there* between the notes. */
+      /* Two banks of held tone, both of them low.
+
+         The pad started two octaves above the drone, on the theory that a
+         held minor chord in the mid register is where sadness lives. It is —
+         but a held minor chord in the mid register that also beats and moves
+         is a siren, and that is what it turned out to be. So it sits down
+         here with the drone instead, dark and quiet, and gets its effect from
+         moving rather than from being heard. */
       this.droneCut = ctx.createBiquadFilter();
       this.droneCut.type = 'lowpass';
       this.droneCut.frequency.value = 300;
       this.droneCut.connect(this.bus);
-      this.partials = this.bank(5, this.droneCut, 0.017, 0.011);
+      this.partials = this.bank(5, this.droneCut, 0.017, 0.011, 4);
 
       this.padCut = ctx.createBiquadFilter();
       this.padCut.type = 'lowpass';
@@ -737,20 +746,28 @@
       // Slower clocks than the drone: a pad voice takes two minutes to come up
       // and go away again, so the chord is never the same twice and you can
       // never catch it changing.
-      this.pads = this.bank(5, this.padCut, 0.008, 0.0055);
+      this.pads = this.bank(5, this.padCut, 0.008, 0.0055, 1.2, 'sine');
 
       this.ready = true;
       return true;
     },
 
-    /** A bank of oscillators, each swelling on its own slow clock. */
-    bank: function (n, dest, base, step) {
+    /**
+     * A bank of oscillators, each swelling on its own slow clock.
+     *
+     * `spread` is the detune in cents between neighbouring voices, and it is
+     * the whole of the difference between warmth and wobble. Down at the
+     * drone's forty hertz, voices four cents apart beat once every several
+     * seconds and the result is body. The same four cents higher up beats
+     * fast enough to be heard as vibrato, so the pad gets almost none.
+     */
+    bank: function (n, dest, base, step, spread, wave) {
       var ctx = this.ctx, out = [];
       for (var v = 0; v < n; v++) {
         var osc = ctx.createOscillator();
-        osc.type = v % 2 ? 'triangle' : 'sine';
+        osc.type = wave || (v % 2 ? 'triangle' : 'sine');
         osc.frequency.value = 110;
-        osc.detune.value = (v - (n - 1) / 2) * 4;
+        osc.detune.value = (v - (n - 1) / 2) * spread;
         var g = ctx.createGain();
         g.gain.value = 0;
         osc.connect(g); g.connect(dest);
@@ -883,7 +900,7 @@
       this.droneCut.frequency.setTargetAtTime(s.drone.cut, now, ramp * 0.4);
       this.padCut.frequency.setTargetAtTime(s.pad.cut, now, ramp * 0.4);
       this.chord(this.partials, s.drone, ramp);
-      this.chord(this.pads, s.pad, ramp);
+      this.revoice(this.pads, s.pad, 1.5);
 
       this.drip = s.drip;
       this.faraway = s.distant;
@@ -896,7 +913,14 @@
       if (this.on) this.schedule(true);
     },
 
-    /** Move a bank of held tone onto another chord, slowly enough to miss. */
+    /**
+     * Move the drone onto another chord by sliding it there.
+     *
+     * Only ever used on the drone, which lives between forty and sixty-five
+     * hertz. A glide down there is not heard as a glide, it is heard as the
+     * floor of the room settling. See revoice() for why the pad may never be
+     * moved this way.
+     */
     chord: function (voices, d, ramp) {
       var now = this.ctx.currentTime, live = this.on ? 1 : 0;
       voices.forEach(function (p, i) {
@@ -907,6 +931,38 @@
         var g = i < d.stack.length ? d.g * live : 0;
         p.gain.gain.setTargetAtTime(g * 0.62, now, ramp * 0.5);
         p.depth.gain.setTargetAtTime(g * 0.38, now, ramp * 0.5);
+      });
+    },
+
+    /**
+     * Move a bank onto another chord without ever sliding a pitch.
+     *
+     * Each voice is taken down to nothing, retuned while there is no sound
+     * coming out of it, and brought back — one at a time, so the new chord
+     * arrives note by note and there is never an instant when the whole bank
+     * is on the move.
+     *
+     * Sliding instead, which is what setTargetAtTime on a frequency does, is
+     * five sustained tones sweeping in pitch together. Five sustained tones
+     * sweeping in pitch together is a siren, and no amount of making it slow
+     * or quiet stops it being one. This is the only way to change a held
+     * chord that does not sound like an alarm.
+     */
+    revoice: function (voices, d, stagger) {
+      var self = this, ctx = this.ctx;
+      voices.forEach(function (p, i) {
+        var t = ctx.currentTime + i * stagger;
+        p.gain.gain.setTargetAtTime(0, t, stagger * 0.32);
+        p.depth.gain.setTargetAtTime(0, t, stagger * 0.32);
+
+        clearTimeout(p.retune);
+        p.retune = setTimeout(function () {
+          var now = ctx.currentTime;
+          var g = (i < d.stack.length && self.on) ? d.g : 0;
+          p.osc.frequency.setValueAtTime(d.root * d.stack[i % d.stack.length], now);
+          p.gain.gain.setTargetAtTime(g * 0.62, now, stagger * 0.55);
+          p.depth.gain.setTargetAtTime(g * 0.38, now, stagger * 0.55);
+        }, (i * stagger + stagger * 2.4) * 1000);
       });
     },
 
@@ -1369,19 +1425,21 @@
       var lp = ctx.createBiquadFilter();
       lp.type = 'lowpass';
       lp.Q.value = 0.7;
-      lp.frequency.setValueAtTime(70, t);
-      lp.frequency.linearRampToValueAtTime(230, t + up);
-      lp.frequency.linearRampToValueAtTime(70, t + up + down);
+      lp.frequency.setValueAtTime(60, t);
+      lp.frequency.linearRampToValueAtTime(150, t + up);
+      lp.frequency.linearRampToValueAtTime(60, t + up + down);
 
       var g = ctx.createGain();
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(rand(0.10, 0.19), t + up);
+      g.gain.linearRampToValueAtTime(rand(0.07, 0.13), t + up);
       g.gain.exponentialRampToValueAtTime(0.0001, t + up + down);
       lp.connect(g);
       this.afar(g, rand(-0.3, 0.3));             // near the centre: it is everywhere
 
-      var f = rand(36, 56);
-      [[1, 1], [1.5, 0.35], [2.004, 0.3]].forEach(function (r, i) {
+      // Root and fifth only. The octave above was the partial that carried it
+      // up into foghorn territory, which is a siren with a different job.
+      var f = rand(36, 52);
+      [[1, 1], [1.5, 0.3]].forEach(function (r, i) {
         var o = ctx.createOscillator();
         var og = ctx.createGain();
         o.type = 'sine';
@@ -1393,30 +1451,43 @@
       });
     },
 
-    /* Wind finding an edge a long way off. A thin sine that takes three
-       seconds to arrive, drifts a few cents while it is there, and goes.
-       Nearly a voice, which is why it is the one that unsettles people. */
+    /* Wind finding an edge a long way off.
+
+       This was a sine, and a sine held for ten seconds while it drifts in
+       pitch is an alarm however quietly it is played — it was half of why the
+       whole thing had started to sound like a siren. It is narrow-band noise
+       now, which is what wind on a ridge actually is: air being filtered by
+       an edge. It still has a pitch you could almost sing, but there is
+       nothing steady underneath it, so it can never lock into a tone. */
     keen: function () {
       var ctx = this.ctx, t = ctx.currentTime;
-      var f = rand(820, 1700);
-      var att = rand(2.2, 4), hold = rand(2, 5), rel = rand(3.5, 7);
+      var att = rand(2.5, 4.5), hold = rand(2, 5), rel = rand(4, 8);
       var end = t + att + hold + rel;
 
+      var src = ctx.createBufferSource();
+      src.buffer = this.beds[0].src.buffer;
+      src.loop = true;
+
+      var bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.Q.value = rand(11, 18);
+      var f = rand(620, 1400);
+      bp.frequency.setValueAtTime(f, t);
+      bp.frequency.linearRampToValueAtTime(f * rand(0.86, 1.16), end);
+
       var g = ctx.createGain();
-      var level = rand(0.012, 0.028);
+      // Far higher than a sine would need: a Q of fifteen throws away almost
+      // everything the noise had.
+      var level = rand(0.22, 0.45);
       g.gain.setValueAtTime(0.0001, t);
       g.gain.linearRampToValueAtTime(level, t + att);
-      g.gain.linearRampToValueAtTime(level * 0.85, t + att + hold);
+      g.gain.linearRampToValueAtTime(level * 0.8, t + att + hold);
       g.gain.exponentialRampToValueAtTime(0.0001, end);
 
-      var o = ctx.createOscillator();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(f, t);
-      o.frequency.linearRampToValueAtTime(f * rand(0.94, 1.06), end);
-      o.connect(g);
-
+      src.connect(bp); bp.connect(g);
       this.afar(g);
-      o.start(t); o.stop(end + 0.3);
+      src.start(t, Math.random() * (src.buffer.duration - 0.4));
+      src.stop(end + 0.3);
     },
 
     /* ----------------------------------------------------------- the drift */
@@ -1443,12 +1514,12 @@
         // The +2 is the one that hurts, so it is in there twice.
         var steps = [-5, -3, -2, 0, 2, 2, 3, 5];
         var step = steps[Math.floor(Math.random() * steps.length)];
-        self.chord(self.pads, {
+        self.revoice(self.pads, {
           root: pad.root * Math.pow(2, step / 12),
           stack: pad.stack, g: pad.g, cut: pad.cut
-        }, 24);
+        }, 3.2);
         self.drift();
-      }, rand(45, 88) * 1000);
+      }, rand(52, 95) * 1000);
     },
 
     /** Noise shaped like a note — the breath in a flute, the nail on a string. */
@@ -1509,6 +1580,7 @@
       clearTimeout(this.dtimer); this.dtimer = null;
       clearTimeout(this.ftimer); this.ftimer = null;
       clearTimeout(this.ptimer); this.ptimer = null;
+      this.pads.forEach(function (p) { clearTimeout(p.retune); });
       var ctx = this.ctx;
       this.master.gain.cancelScheduledValues(ctx.currentTime);
       this.master.gain.linearRampToValueAtTime(0, ctx.currentTime + (hard ? 0.6 : 1.6));
