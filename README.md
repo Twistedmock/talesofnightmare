@@ -204,10 +204,12 @@ back. Dark artwork would want the opposite. Tuning is at the top of
 
 ## 5. The weather
 
-Every visit gets a different one — **rain, snow, mist, sun, wind, ash** — never
-the same one twice running. The **weather** control next to the glass toggle
-pins one, or takes it off with *nothing*; *whatever comes* puts it back to
-random. Choosing the weather you are already in draws a different instrument.
+Every visit opens on a different one — **rain, snow, mist, sun, wind, ash** —
+never the same one twice running, and it **turns over again every couple of
+minutes**, because nobody refreshes a gallery. The **weather** control next to
+the glass toggle pins one and stops the rotation, or takes it off with
+*nothing*; *whatever comes* puts it back. Choosing the weather you are already
+in draws a different pair of instruments.
 
 Each weather is two canvases, a far one behind the work and a near one in front
 of it, plus a retint of the ground and of the lamp over each piece. The near
@@ -218,28 +220,40 @@ so it begins on the first thing the visitor touches — which on this site is th
 tap that lifts the veil. Pressing **silence** is remembered; nothing plays for
 that visitor again.
 
-Nothing is a recording. Every sample is generated in the browser, in six layers
-on clocks that never line up, so it does not repeat:
+### The music and the weather are separate
 
-| Layer | What it is |
-|---|---|
-| beds | filtered noise — the hiss of rain, the hush under snow, wind sweeping |
-| drone | a low pedal that never moves |
-| pad | a held minor chord that shifts to a neighbour once a minute, over 20s |
-| drips | water off a sill, ice settling, a rope creaking, embers going out |
-| instrument | one of ten, drawn fresh each visit from those that suit the weather |
-| distance | an owl, a stone down a mountainside, a far thin sound, a low swell |
+There is **one piece of music**, and it does not change when the season does.
+The weather changes only what is weather.
+
+| | Layer | What it is |
+|---|---|---|
+| **music** | drone | a low pedal in A that never moves |
+| | pad | a held chord that shifts to a neighbour once a minute, over 20s |
+| | instruments | two of the ten, one near and one far, drawn per visit |
+| **weather** | beds | filtered noise — rain's hiss, snow's hush, wind sweeping |
+| | drips | water off a sill, ice settling, a rope creaking, embers |
+| | distance | an owl, a stone down a mountainside, a thin far sound, a swell |
+
+Nothing is a recording. Every sample is generated in the browser, and no two
+layers share a clock, so it never repeats.
 
 The ten instruments are shakuhachi, temple bell and koto (japan), cedar flute
 (north america), duduk (armenia), bansuri (india), guqin (china), kalimba (east
-africa), gong (java) and glass (europe). Whichever arrived is named under the
-controls for a few seconds.
+africa), gong (java) and glass (europe). Two are drawn each visit, never from
+the same family — a flute answered by something plucked or struck. They keep
+their own timbre, ornaments and register but all play from the same scale, so
+they are two instruments in one piece rather than two pieces at once. Whichever
+pair arrived is named under the controls for a few seconds.
 
-Everything is tuned in one table at the top of `assets/js/weather.js` — one
-entry per weather for what falls and what it sounds like, and one per
-instrument for how it is built. To drop a weather entirely, remove it from
-`ORDER` there **and** from `ALL` in `assets/js/boot.js`, which picks the weather
-before the first paint so the palette never flashes.
+Everything is tuned in two tables at the top of `assets/js/weather.js`: `MUSIC`
+for the piece, and one entry per weather for what falls and what it sounds like.
+To drop a weather, remove it from `ORDER` there **and** from `ALL` in
+`assets/js/boot.js`, which picks the weather before the first paint so the
+palette never flashes.
+
+> Both stored preferences are versioned (`weather.pick.v2`, `weather.sound.v2`).
+> Bump the suffix to hand every visitor a clean default back — a pin or a mute
+> is sticky for ever otherwise.
 
 `prefers-reduced-motion` keeps the colour and the sound and drops the canvases.
 With the script blocked there is no weather and no controls, and the gallery is

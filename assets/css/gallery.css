@@ -303,6 +303,9 @@ a:hover { color: var(--sorrow); border-bottom-color: var(--sorrow-dim); }
   transition: opacity 1.4s var(--ease), transform 1.4s var(--ease);
 }
 .sounding.is-on { opacity: 1; transform: none; }
+.sounding span { display: block; }
+/* Fainter, because that is also where it sits in the mix. */
+.sounding__second { font-size: 0.82rem; opacity: 0.62; margin-top: 0.15rem; }
 
 .pill,
 .glass-toggle {

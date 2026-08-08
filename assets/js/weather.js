@@ -2,25 +2,30 @@
    The weather, and the sound of it.
 
    A room has weather, and this one gets a different one every time the door
-   opens — rain, snow, mist, sun, wind, ash. Each is drawn on two canvases,
+   opens — rain, snow, mist, sun, wind, ash — and then turns it over again
+   every couple of minutes, because nobody refreshes a gallery. Each is drawn
+   on two canvases,
    one behind the work and one in front of it, because a single plane of
    falling things reads as wallpaper; it is the near layer, out of focus and
    twice as fast, that makes the room have a depth to stand in.
 
-   Each weather is also a sound, in four layers that are always running at
-   once: beds of filtered noise for the weather itself, a drone under
-   everything and a held minor chord above it that never quite resolves, the
-   small incidental sounds a room makes on its own — water off a sill, ice
-   settling, a rope taking the strain — and over all of it an instrument,
-   drawn fresh from the handful that suit the weather. Every note is played
-   into seven seconds of reverb, so nothing ever entirely stops.
+   There is one piece of music, and it does not change when the weather
+   does. A drone that never moves, a chord above it that shifts to a
+   neighbour once a minute, and two instruments — one near, one at the far
+   end of the room — drawn fresh every time the page opens and then left
+   alone. All of it in A, mostly pentatonic, with two colour tones that come
+   up about a quarter of the time and are where the ache is.
 
-   Over the top of all four, every half-minute or so, something happens a
-   long way off: an owl, a stone coming down a mountainside, a thin sound
-   like wind on a far ridge, or a swell at forty hertz you do not so much
-   hear as notice afterwards. These go out through a separate eleven-second
-   reverb and almost nothing of them arrives dry, so what you are listening
-   to is not the owl — it is how far away the owl is.
+   What the weather changes is only what is weather. Beds of filtered noise:
+   the hiss of rain, the hush under snow, a cutoff sweeping for wind. The
+   small sounds a room makes on its own — water off a sill, ice settling, a
+   rope taking the strain, a fire going out — each on its own clock, so no
+   two ever fall in step. And every half-minute or so something a long way
+   off: an owl, a stone coming down a mountainside, a thin sound like wind on
+   a far ridge, or a swell at forty hertz you do not so much hear as notice
+   afterwards. Those go out through a separate eleven-second reverb and
+   almost nothing of them arrives dry, so what you are listening to is not
+   the owl — it is how far away the owl is.
 
    All of it is synthesised here. There is not an audio file on the server,
    which is why a weather can be *tuned into* another one over three seconds
@@ -36,8 +41,8 @@
   var root = document.documentElement;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var PICK_KEY  = 'weather.pick.v1';
-  var SOUND_KEY = 'weather.sound.v1';
+  var PICK_KEY  = 'weather.pick.v2';
+  var SOUND_KEY = 'weather.sound.v2';
 
   var MAX_FPS = 40;          // soft particles gain nothing above this
   var REF_AREA = 1440 * 900; // particle counts are quoted for this screen
@@ -75,14 +80,14 @@
           { type: 'highpass', f: 1150, q: 0.5, g: 0.080, sway: [0.6, 1.5, 11] },
           { type: 'bandpass', f: 400,  q: 0.8, g: 0.048 }
         ],
-        drone: { root: 55, stack: [1, 1.189, 1.5, 2], g: 0.050, cut: 340 },
-        pad: { root: 55, stack: [1, 1.189, 1.5, 2, 2.378], g: 0.022, cut: 400 },
         // Water off a sill, into something. The loneliest sound there is.
-        drip: { kind: 'drop', gap: [2.2, 7], f: [1500, 380], g: 0.10 },
+        // Two clocks, so the near drops and the far ones never fall in step.
+        drips: [
+          { kind: 'drop', gap: [2.2, 7], f: [1500, 380], g: 0.10 },
+          { kind: 'drop', gap: [5, 13], f: [820, 220], g: 0.075 }
+        ],
         // Rain at night is the one that gets an owl.
-        distant: ['owl', 'owl', 'abyss', 'keen'],
-        voices: ['shakuhachi', 'koto', 'cedar', 'duduk', 'kalimba', 'bansuri'],
-        reg: 1, gapMul: 0.7
+        distant: ['owl', 'owl', 'abyss', 'keen']
       }
     },
 
@@ -110,13 +115,12 @@
           { type: 'lowpass', f: 620, q: 0.4, g: 0.022 },
           { type: 'lowpass', f: 190, q: 0.6, g: 0.032, sway: [0.5, 1.4, 17] }
         ],
-        drone: { root: 65.41, stack: [1, 1.189, 2, 2.378], g: 0.046, cut: 260 },
-        pad: { root: 65.41, stack: [1, 1.189, 1.782, 2, 2.378], g: 0.019, cut: 440 },
-        // Ice finding somewhere to settle.
-        drip: { kind: 'tick', gap: [6, 16], f: [4200, 7000], g: 0.030 },
-        distant: ['keen', 'abyss', 'stone'],
-        voices: ['bonsho', 'glass', 'koto', 'shakuhachi', 'guqin'],
-        reg: 1, gapMul: 1
+        // Ice finding somewhere to settle, and the thaw underneath it.
+        drips: [
+          { kind: 'tick', gap: [6, 16], f: [4200, 7000], g: 0.030 },
+          { kind: 'drop', gap: [9, 22], f: [1100, 300], g: 0.070 }
+        ],
+        distant: ['keen', 'abyss', 'stone', 'owl']
       }
     },
 
@@ -140,15 +144,15 @@
           { type: 'lowpass', f: 300, q: 0.5, g: 0.030 },
           { type: 'lowpass', f: 110, q: 0.7, g: 0.042, sway: [0.6, 1.3, 23] }
         ],
-        drone: { root: 41.20, stack: [1, 1.5, 1.782, 2, 3], g: 0.085, cut: 200 },
-        pad: { root: 41.20, stack: [1, 1.5, 2, 2.378, 3], g: 0.026, cut: 320 },
         // Deeper and rarer than the rain's. This one is in a cave.
-        drip: { kind: 'drop', gap: [5, 14], f: [900, 210], g: 0.115 },
+        drips: [
+          { kind: 'drop', gap: [5, 14], f: [900, 210], g: 0.115 },
+          { kind: 'drop', gap: [11, 26], f: [1600, 420], g: 0.065 },
+          { kind: 'creak', gap: [17, 40], f: [150, 300], g: 0.055 }
+        ],
         // Mist gets all four. It is the emptiest of the six and the only one
         // where you cannot see far enough to know what made the sound.
-        distant: ['owl', 'abyss', 'keen', 'stone'],
-        voices: ['bonsho', 'duduk', 'glass', 'gong', 'shakuhachi'],
-        reg: 0.5, gapMul: 1.1
+        distant: ['owl', 'abyss', 'keen', 'stone']
       }
     },
 
@@ -175,15 +179,13 @@
           { type: 'lowpass', f: 1800, q: 0.4, g: 0.014, sway: [0.5, 1.3, 19] },
           { type: 'lowpass', f: 240,  q: 0.5, g: 0.020 }
         ],
-        // A major stack, but voiced so wide it never lands anywhere.
-        drone: { root: 65.41, stack: [1, 1.5, 2.5, 3], g: 0.055, cut: 420 },
-        pad: { root: 65.41, stack: [1, 1.5, 2, 2.5, 3], g: 0.020, cut: 480 },
         // A warm house ticking. Nobody in it.
-        drip: { kind: 'tick', gap: [9, 22], f: [2600, 4200], g: 0.022 },
+        drips: [
+          { kind: 'tick', gap: [9, 22], f: [2600, 4200], g: 0.022 },
+          { kind: 'creak', gap: [15, 34], f: [190, 360], g: 0.050 }
+        ],
         // No owl in daylight. Stone, heat and distance — a desert, not a night.
-        distant: ['abyss', 'keen', 'stone', 'stone'],
-        voices: ['kalimba', 'cedar', 'bansuri', 'guqin', 'glass'],
-        reg: 1, gapMul: 0.85
+        distant: ['abyss', 'keen', 'stone', 'stone']
       }
     },
 
@@ -208,13 +210,12 @@
             sway: [0.45, 1.4, 6.5] },
           { type: 'lowpass',  f: 95,  q: 0.7, g: 0.048 }
         ],
-        drone: { root: 49, stack: [1, 1.189, 1.5, 2.378], g: 0.048, cut: 300 },
-        pad: { root: 49, stack: [1, 1.189, 1.5, 2, 2.997], g: 0.020, cut: 380 },
         // Something wooden taking the strain and letting it go again.
-        drip: { kind: 'creak', gap: [8, 20], f: [170, 340], g: 0.075 },
-        distant: ['keen', 'keen', 'stone', 'abyss'],
-        voices: ['shakuhachi', 'duduk', 'gong', 'cedar', 'guqin'],
-        reg: 0.5, gapMul: 0.9
+        drips: [
+          { kind: 'creak', gap: [8, 20], f: [170, 340], g: 0.075 },
+          { kind: 'tick', gap: [13, 30], f: [1800, 3400], g: 0.020 }
+        ],
+        distant: ['keen', 'stone', 'abyss', 'owl']
       }
     },
 
@@ -238,13 +239,12 @@
           { type: 'lowpass', f: 520, q: 0.5, g: 0.036, sway: [0.5, 1.4, 13] },
           { type: 'bandpass', f: 88, q: 2.0, g: 0.044 }
         ],
-        drone: { root: 43.65, stack: [1, 1.189, 1.414, 2], g: 0.078, cut: 220 },
-        pad: { root: 43.65, stack: [1, 1.189, 1.414, 2, 2.378], g: 0.024, cut: 340 },
-        // What is left of a fire, going out.
-        drip: { kind: 'crackle', gap: [4, 12], f: [600, 2200], g: 0.045 },
-        distant: ['stone', 'abyss', 'keen', 'owl'],
-        voices: ['gong', 'bonsho', 'duduk', 'kalimba', 'cedar'],
-        reg: 0.5, gapMul: 0.8
+        // What is left of a fire, going out, and something dripping in it.
+        drips: [
+          { kind: 'crackle', gap: [4, 12], f: [600, 2200], g: 0.045 },
+          { kind: 'drop', gap: [10, 24], f: [1000, 260], g: 0.070 }
+        ],
+        distant: ['stone', 'abyss', 'keen', 'owl']
       }
     },
 
@@ -258,12 +258,8 @@
       near: null,
       sound: {
         beds: [{ type: 'lowpass', f: 150, q: 0.5, g: 0.016 }],
-        drone: { root: 48.99, stack: [1, 1.5, 2], g: 0.042, cut: 180 },
-        pad: { root: 48.99, stack: [1, 1.5, 2, 2.997], g: 0.017, cut: 300 },
-        drip: { kind: 'drop', gap: [9, 24], f: [1100, 260], g: 0.085 },
-        distant: ['owl', 'abyss', 'keen', 'stone'],
-        voices: ['bonsho', 'glass', 'guqin'],
-        reg: 0.5, gapMul: 1.2
+        drips: [{ kind: 'drop', gap: [9, 24], f: [1100, 260], g: 0.085 }],
+        distant: ['owl', 'abyss', 'keen', 'stone']
       }
     }
   };
@@ -290,14 +286,44 @@
      almost all of the sadness in this file actually lives.
      ================================================================== */
 
+  /* ==================================================================
+     The music.
+
+     One piece, the same in every weather.
+
+     It used to be seven — each weather had its own key, register and pool of
+     instruments — and with the weather now turning over every couple of
+     minutes that meant the music restarted every couple of minutes too. A
+     season is a change in the light and what is falling past the window. It
+     is not a reason for the room to start playing something else.
+
+     So the drone, the chord above it and the two instruments are fixed for
+     the whole visit, and the weather changes only what is *weather*: the
+     noise, the drips, and what happens in the distance.
+
+     Everything is in A. The pentatonic is what the notes are mostly drawn
+     from, and the two colour tones — the flat second and the flat sixth —
+     come up about a quarter of the time. Those two are where the ache is;
+     used more often than that they stop being an ache and become a mode.
+     ================================================================== */
+
+  var MUSIC = {
+    tonic:  55,                                  // A1
+    scale:  [0, 3, 5, 7, 10],                    // A  C  D  E  G
+    colour: [1, 8],                              // Bb and F
+    drone: { root: 55, stack: [1, 1.189, 1.5, 2], g: 0.055, cut: 300 },
+    pad:   { root: 55, stack: [1, 1.189, 1.5, 2, 2.378], g: 0.024, cut: 400 },
+    gapMul: 1
+  };
+
   var VOICES = {
 
     /* The In scale — [0,1,5,7,8] — is the sound most people mean when they
        say "Japanese". The instrument is mostly breath; the tone is what is
        left over. */
     shakuhachi: {
-      name: 'shakuhachi', from: 'japan',
-      root: 293.66, scale: [0, 1, 5, 7, 8], curve: 'flute',
+      name: 'shakuhachi', from: 'japan', family: 'blown',
+      oct: 2, curve: 'flute',
       partials: [[1, 1], [2, 0.10], [3, 0.06], [4, 0.03]],
       attack: [0.35, 0.8], rel: [5, 9], g: 0.085,
       breath: 0.6, chiff: 0.10, vib: [4.8, 0.011, 1.0],
@@ -308,16 +334,16 @@
        out the hum tone, which is the partial an octave *below* the strike and
        the reason a bonshō sounds bottomless. */
     bonsho: {
-      name: 'temple bell', from: 'japan',
-      root: 55, scale: [0, 5], curve: 'bell',
+      name: 'temple bell', from: 'japan', family: 'struck',
+      oct: 0, curve: 'bell',
       partials: [[0.5, 0.55], [1, 1], [2, 0.45], [2.98, 0.26], [4.15, 0.15], [5.43, 0.08]],
       attack: [0.006, 0.012], rel: [15, 24], g: 0.105,
       chiff: 0.28, cut: [9, 1.1, 0.9], gap: [24, 52]
     },
 
     koto: {
-      name: 'koto', from: 'japan',
-      root: 293.66, scale: [0, 1, 5, 7, 8], curve: 'pluck',
+      name: 'koto', from: 'japan', family: 'plucked',
+      oct: 2, curve: 'pluck',
       partials: [[1, 1], [2, 0.30], [3, 0.13], [4.02, 0.06]],
       attack: [0.004, 0.009], rel: [2.6, 5], g: 0.080,
       chiff: 0.32, bend: 0.22, glide: 0.09, cut: [10, 2, 1.1], gap: [7, 16]
@@ -327,8 +353,8 @@
        flicked in a twentieth of a second ahead of the real one — which is
        more of the style's signature than the timbre is. */
     cedar: {
-      name: 'cedar flute', from: 'north america',
-      root: 220, scale: [0, 3, 5, 7, 10], curve: 'flute',
+      name: 'cedar flute', from: 'north america', family: 'blown',
+      oct: 2, curve: 'flute',
       partials: [[1, 1], [2, 0.18], [3, 0.07]],
       attack: [0.12, 0.3], rel: [4, 7.5], g: 0.082,
       breath: 0.32, chiff: 0.2, vib: [5.5, 0.010, 0.55],
@@ -338,8 +364,8 @@
     /* Phrygian, for the flat second. A reed instrument is a sawtooth with
        almost everything above the third formant taken off it. */
     duduk: {
-      name: 'duduk', from: 'armenia',
-      root: 220, scale: [0, 1, 4, 5, 7, 8], curve: 'flute', wave: 'sawtooth',
+      name: 'duduk', from: 'armenia', family: 'blown',
+      oct: 2, curve: 'flute', wave: 'sawtooth',
       partials: [[1, 1], [2, 0.5], [3, 0.28], [4, 0.12]],
       attack: [0.25, 0.5], rel: [6, 11], g: 0.062,
       breath: 0.18, vib: [5.2, 0.016, 0.85], cut: [3.2, 1.5, 4], gap: [9, 20]
@@ -348,8 +374,8 @@
     /* The meend: the note is entered from a whole tone below and slid up
        into. Take that away and it is just a flute. */
     bansuri: {
-      name: 'bansuri', from: 'india',
-      root: 293.66, scale: [0, 1, 5, 7, 10], curve: 'flute',
+      name: 'bansuri', from: 'india', family: 'blown',
+      oct: 2, curve: 'flute',
       partials: [[1, 1], [2, 0.22], [3, 0.08]],
       attack: [0.2, 0.45], rel: [5, 9], g: 0.080,
       breath: 0.42, vib: [6, 0.013, 0.6], grace: 0.3,
@@ -359,8 +385,8 @@
     /* Plucked, then bent afterwards — the string is pushed while it is still
        ringing. Almost every guqin phrase does this. */
     guqin: {
-      name: 'guqin', from: 'china',
-      root: 146.83, scale: [0, 2, 5, 7, 9], curve: 'pluck',
+      name: 'guqin', from: 'china', family: 'plucked',
+      oct: 1, curve: 'pluck',
       partials: [[1, 1], [2, 0.26], [3, 0.09], [4, 0.04]],
       attack: [0.005, 0.012], rel: [4.5, 8], g: 0.078,
       chiff: 0.34, slide: [1.6, 0.5, 1.4], cut: [8, 1.8, 1.0], gap: [9, 21]
@@ -368,8 +394,8 @@
 
     /* The partial at 2.76 is a struck metal tine and nothing else. */
     kalimba: {
-      name: 'kalimba', from: 'east africa',
-      root: 440, scale: [0, 3, 5, 7, 10], curve: 'pluck',
+      name: 'kalimba', from: 'east africa', family: 'plucked',
+      oct: 3, curve: 'pluck',
       partials: [[1, 1], [2.76, 0.30], [5.4, 0.10]],
       attack: [0.003, 0.007], rel: [1.3, 2.6], g: 0.075,
       chiff: 0.24, cut: [8, 3, 1.0], gap: [7, 16]
@@ -378,8 +404,8 @@
     /* Shimmer is two of everything, three cents apart. The beating between
        them is the whole sound of a gamelan. */
     gong: {
-      name: 'gong', from: 'java',
-      root: 73.42, scale: [0, 2, 7], curve: 'bell',
+      name: 'gong', from: 'java', family: 'struck',
+      oct: 1, curve: 'bell',
       partials: [[1, 1], [1.5, 0.28], [2.04, 0.40], [2.9, 0.22], [4.1, 0.12]],
       attack: [0.02, 0.05], rel: [11, 20], g: 0.090,
       chiff: 0.3, shimmer: 0.7, cut: [7, 1.3, 0.9], gap: [20, 44]
@@ -388,8 +414,8 @@
     /* Wet fingers on a glass rim. Three seconds to arrive, which is longer
        than most visitors will have realised a note can take. */
     glass: {
-      name: 'glass', from: 'europe',
-      root: 440, scale: [0, 3, 7, 10], curve: 'bow',
+      name: 'glass', from: 'europe', family: 'bowed',
+      oct: 3, curve: 'bow',
       partials: [[1, 1], [2, 0.14], [3, 0.05]],
       // No shimmer at all. Glass is the one instrument here that is genuinely
       // a held pure tone, and a held pure tone with a second copy beating
@@ -897,20 +923,31 @@
         }
       });
 
-      this.droneCut.frequency.setTargetAtTime(s.drone.cut, now, ramp * 0.4);
-      this.padCut.frequency.setTargetAtTime(s.pad.cut, now, ramp * 0.4);
-      this.chord(this.partials, s.drone, ramp);
-      this.revoice(this.pads, s.pad, 1.5);
-
-      this.drip = s.drip;
+      // The drone, the chord and the instruments are not touched. They are
+      // the piece, and the piece does not change because it started raining.
+      this.drip = s.drips;
       this.faraway = s.distant;
-      if (this.on) { this.drips(true); this.distant(true); this.drift(); }
+      if (this.on) { this.drips(true); this.distant(true); }
+    },
 
-      this.reg = s.reg || 1;
-      this.gapMul = s.gapMul || 1;
-      this.pool = s.voices;
-      this.pick();
-      if (this.on) this.schedule(true);
+    /**
+     * Set the piece going. Called once, when the sound starts.
+     *
+     * The pair of instruments is drawn here and then left alone for the rest
+     * of the visit — different every time the page is opened, and the same
+     * from the first weather to the last.
+     */
+    music: function () {
+      var now = this.ctx.currentTime;
+      this.droneCut.frequency.setTargetAtTime(MUSIC.drone.cut, now, 1);
+      this.padCut.frequency.setTargetAtTime(MUSIC.pad.cut, now, 1);
+      this.chord(this.partials, MUSIC.drone, 3);
+      this.revoice(this.pads, MUSIC.pad, 1.5);
+      this.gapMul = MUSIC.gapMul;
+      this.pool = Object.keys(VOICES);
+      if (!this.lead) this.pick();
+      this.schedule(true);
+      this.drift();
     },
 
     /**
@@ -967,34 +1004,77 @@
     },
 
     /**
-     * Draw the instrument for this weather.
+     * Draw the pair of instruments for this weather.
      *
-     * Never the same one twice running while a pool has an alternative — a
-     * feature whose whole point is that it varies has to be *seen* to vary,
-     * and a coin that comes up shakuhachi twice reads as no feature at all.
+     * Two, not one, and never from the same family — a flute answered by
+     * something plucked or struck, or the other way round. One instrument
+     * alone is a solo, and a solo on a page somebody is going to sit with
+     * for ten minutes becomes a thing being played at them. Two on
+     * independent clocks that never line up is an ensemble, and the ear
+     * keeps following it.
+     *
+     * The second is quieter, rarer, and sent almost entirely into the
+     * reverb, so it is not beside the first one — it is behind it, at the
+     * other end of the room.
      */
-    pick: function (force) {
+    pick: function () {
       if (!this.pool || !this.pool.length) return;
-      var was = this.voice && this.voice.name;
+      var was = this.lead && this.lead.name;
       var pool = this.pool.filter(function (k) { return VOICES[k].name !== was; });
       if (!pool.length) pool = this.pool;
-      this.voice = VOICES[pool[Math.floor(Math.random() * pool.length)]];
-      if (this.onvoice) this.onvoice(this.voice, force);
+      this.lead = VOICES[pool[Math.floor(Math.random() * pool.length)]];
+
+      var lead = this.lead;
+      var others = this.pool.filter(function (k) {
+        return VOICES[k].family !== lead.family;
+      });
+      // Every pool is built to hold at least two families, but if one ever
+      // does not, better a second of the same kind than no second at all.
+      if (!others.length) {
+        others = this.pool.filter(function (k) { return VOICES[k].name !== lead.name; });
+      }
+      this.second = others.length
+        ? VOICES[others[Math.floor(Math.random() * others.length)]]
+        : null;
+
+      if (this.onvoice) this.onvoice(this.lead, this.second);
     },
 
     /* ----------------------------------------------------------- a note */
 
+    /** slot 0 is the lead, dry and near. slot 1 is the far one. */
     schedule: function (soon) {
-      if (this.timer) { clearTimeout(this.timer); this.timer = null; }
-      if (!this.on || !this.voice) return;
       var self = this;
-      var v = this.voice;
-      // On a weather change the clock is not reset to a full wait, or the
-      // first half-minute of the new weather has nothing in it.
-      var wait = soon ? rand(2.5, 6) : rand(v.gap[0], v.gap[1]) * this.gapMul;
-      this.timer = setTimeout(function () {
-        self.strike();
-        self.schedule();
+      [0, 1].forEach(function (slot) {
+        var key = slot ? 'timer2' : 'timer';
+        clearTimeout(self[key]);
+        self[key] = null;
+        var v = slot ? self.second : self.lead;
+        if (!self.on || !v) return;
+        // On a weather change the clock is not reset to a full wait, or the
+        // first half-minute of the new weather has nothing in it. The far one
+        // waits longer, so the two never arrive together on the first pass.
+        var wait = soon
+          ? (slot ? rand(9, 17) : rand(2.5, 6))
+          : rand(v.gap[0], v.gap[1]) * self.gapMul * (slot ? 1.7 : 1);
+        self[key] = setTimeout(function () {
+          self.strike(v, slot ? self.room : self.bus, slot ? 0.5 : 1);
+          self.again(slot);
+        }, wait * 1000);
+      });
+    },
+
+    /** Re-arm one slot without disturbing the other's clock. */
+    again: function (slot) {
+      var self = this;
+      var key = slot ? 'timer2' : 'timer';
+      var v = slot ? this.second : this.lead;
+      clearTimeout(this[key]);
+      if (!this.on || !v) return;
+      var wait = rand(v.gap[0], v.gap[1]) * this.gapMul * (slot ? 1.7 : 1);
+      this[key] = setTimeout(function () {
+        self.strike(v, slot ? self.room : self.bus, slot ? 0.5 : 1);
+        self.again(slot);
       }, wait * 1000);
     },
 
@@ -1005,33 +1085,36 @@
      * or twenty seconds is nothing, and it is far simpler than keeping a
      * voice allocated and re-triggering it.
      */
-    strike: function (freq, when, level) {
-      if (!this.on || !this.ready || !this.voice) return;
-      var ctx = this.ctx, v = this.voice;
+    strike: function (v, dest, loud, freq, when, level) {
+      if (!this.on || !this.ready || !v) return;
+      var ctx = this.ctx;
       var t = when || ctx.currentTime;
 
       var f = freq;
       if (!f) {
-        var deg = v.scale[Math.floor(Math.random() * v.scale.length)];
+        // Mostly the pentatonic, and about a quarter of the time one of the
+        // two that hurt.
+        var from = Math.random() < 0.25 ? MUSIC.colour : MUSIC.scale;
+        var deg = from[Math.floor(Math.random() * from.length)];
         // Sometimes it answers itself an octave away. Bells and gongs stay
         // where they are — a temple bell has one pitch.
         var oct = (v.curve !== 'bell' && Math.random() < 0.3)
                     ? (Math.random() < 0.62 ? -1 : 1) : 0;
-        f = v.root * this.reg * Math.pow(2, deg / 12 + oct);
+        f = MUSIC.tonic * Math.pow(2, v.oct + oct + deg / 12);
 
         // A lower neighbour flicked in ahead of the real note. The grace goes
         // now and the note it belongs to is pushed back behind it — nothing
         // can be scheduled into the past, so the ornament cannot be moved
         // earlier, only the note later.
         if (v.grace && Math.random() < v.grace) {
-          this.strike(f * Math.pow(2, -2 / 12), t, 0.4);
+          this.strike(v, dest, loud, f * Math.pow(2, -2 / 12), t, 0.4);
           t += 0.075;
         }
       }
 
       var att = rand(v.attack[0], v.attack[1]);
       var rel = rand(v.rel[0], v.rel[1]);
-      var peak = v.g * (level || rand(0.6, 1));
+      var peak = v.g * loud * (level || rand(0.6, 1));
       var end = t + att + rel;
 
       /* ------------------------------------------------------- the shape */
@@ -1059,9 +1142,9 @@
       if (ctx.createStereoPanner) {
         var pan = ctx.createStereoPanner();
         pan.pan.value = rand(-0.6, 0.6);               // it comes from somewhere
-        lp.connect(pan); pan.connect(this.bus);
+        lp.connect(pan); pan.connect(dest);
       } else {
-        lp.connect(this.bus);
+        lp.connect(dest);
       }
 
       /* ------------------------------------------------------ the pitch */
@@ -1124,8 +1207,8 @@
 
       /* ------------------------------------------------- breath and chiff */
 
-      if (v.breath) this.air(t, end, f * 1.9, 1.4, peak * v.breath * 0.55, att);
-      if (v.chiff)  this.air(t, t + 0.14, f * 3, 1.0, peak * v.chiff, 0.008);
+      if (v.breath) this.air(t, end, f * 1.9, 1.4, peak * v.breath * 0.55, att, dest);
+      if (v.chiff)  this.air(t, t + 0.14, f * 3, 1.0, peak * v.chiff, 0.008, dest);
     },
 
     /* ================================================================
@@ -1141,22 +1224,40 @@
        drop sound like it is happening somewhere you are not.
        ================================================================ */
 
+    /**
+     * One clock per kind, all running together.
+     *
+     * A weather is rarely one sound. Rain off a sill and rain into a drain
+     * are different sizes of the same thing, and on two independent clocks
+     * they never fall in step — which is the difference between a room and
+     * a loop.
+     */
     drips: function (soon) {
-      clearTimeout(this.dtimer);
-      this.dtimer = null;
+      (this.dtimers || []).forEach(clearTimeout);
+      this.dtimers = [];
       if (!this.on || !this.drip) return;
       var self = this;
-      // Read off `self.drip` at fire time, not off a captured copy — the
-      // weather can change between scheduling and landing.
-      var wait = soon ? rand(0.8, 3) : rand(this.drip.gap[0], this.drip.gap[1]);
-      this.dtimer = setTimeout(function () {
-        var d = self.drip;
-        if (!d) return;
+      // Captured by index, not by value: the spec array is swapped wholesale
+      // on a weather change, and a timer already in flight must land on
+      // whatever the weather is by then, or on nothing.
+      this.drip.forEach(function (_, i) {
+        self.tap(i, soon);
+      });
+    },
+
+    tap: function (i, soon) {
+      var self = this;
+      var here = this.drip && this.drip[i];
+      if (!this.on || !here) return;
+      var wait = soon ? rand(0.8, 4) : rand(here.gap[0], here.gap[1]);
+      this.dtimers[i] = setTimeout(function () {
+        var d = self.drip && self.drip[i];
+        if (!d || !self.on) return;
         if (d.kind === 'drop') self.drop(d);
         else if (d.kind === 'tick') self.tick(d);
         else if (d.kind === 'creak') self.creak(d);
         else self.crackle(d);
-        self.drips();
+        self.tap(i);
       }, wait * 1000);
     },
 
@@ -1509,7 +1610,7 @@
       var self = this;
       this.ptimer = setTimeout(function () {
         if (!self.on) return;
-        var pad = spec(current).sound.pad;
+        var pad = MUSIC.pad;
         // All of these are consonant over a fixed pedal in a minor context.
         // The +2 is the one that hurts, so it is in there twice.
         var steps = [-5, -3, -2, 0, 2, 2, 3, 5];
@@ -1523,7 +1624,7 @@
     },
 
     /** Noise shaped like a note — the breath in a flute, the nail on a string. */
-    air: function (t, end, centre, q, level, att) {
+    air: function (t, end, centre, q, level, att, dest) {
       var ctx = this.ctx;
       var src = ctx.createBufferSource();
       src.buffer = this.beds[0].src.buffer;
@@ -1543,7 +1644,7 @@
       g.gain.linearRampToValueAtTime(level, t + att);
       g.gain.exponentialRampToValueAtTime(0.0001, end);
 
-      src.connect(bp); bp.connect(g); g.connect(this.bus);
+      src.connect(bp); bp.connect(g); g.connect(dest || this.bus);
       src.start(t, Math.random() * (src.buffer.duration - 0.5));
       src.stop(end + 0.1);
     },
@@ -1556,15 +1657,14 @@
       clearTimeout(this.sleep);
       this.on = true;
       this.tune(current, 0.1);
+      this.music();
       this.master.gain.cancelScheduledValues(this.ctx.currentTime);
       // Four and a half seconds to arrive. Anything quicker is a thing being
       // switched on, and the room should only ever seem to have been like this
       // since before you got here.
-      this.master.gain.linearRampToValueAtTime(0.55, this.ctx.currentTime + 4.5);
-      this.schedule(true);
+      this.master.gain.linearRampToValueAtTime(0.78, this.ctx.currentTime + 4.5);
       this.drips(true);
       this.distant(true);
-      this.drift();
       return true;
     },
 
@@ -1577,7 +1677,8 @@
       if (!this.ready) return;
       this.on = false;
       clearTimeout(this.timer); this.timer = null;
-      clearTimeout(this.dtimer); this.dtimer = null;
+      clearTimeout(this.timer2); this.timer2 = null;
+      (this.dtimers || []).forEach(clearTimeout); this.dtimers = [];
       clearTimeout(this.ftimer); this.ftimer = null;
       clearTimeout(this.ptimer); this.ptimer = null;
       this.pads.forEach(function (p) { clearTimeout(p.retune); });
@@ -1633,6 +1734,7 @@
         else localStorage.setItem(PICK_KEY, pinned);
       } catch (e) {}
       mark();
+      rotate();
     }
     if (key === 'auto') { label(current); return; }
     // Choosing the weather you are already in is how you ask for a different
@@ -1654,6 +1756,33 @@
       if (Sky.running) Sky.populate(key);
       root.classList.remove('is-turning');
     }, 1250);
+  }
+
+  /**
+   * The weather turns over on its own, roughly every two minutes.
+   *
+   * A season per refresh is only a season per refresh if the visitor
+   * refreshes, and nobody refreshes a gallery — they scroll it for ten
+   * minutes and leave. Rotating means the room they arrived in is not the
+   * room they leave, which is the whole point of the thing having weather.
+   *
+   * Only in `whatever comes`. Somebody who picked mist wants mist.
+   */
+  var turning;
+
+  function rotate() {
+    clearTimeout(turning);
+    if (pinned !== null) return;
+    turning = setTimeout(function () {
+      // Not while the tab is in the background — the crossfade would be
+      // spent on nobody, and they would come back to a room that had
+      // changed for no reason they saw. Not with the menu open either.
+      if (!document.hidden && ui.menu && ui.menu.hidden) {
+        var pool = ORDER.filter(function (w) { return w !== current; });
+        change(pool[Math.floor(Math.random() * pool.length)], false);
+      }
+      rotate();
+    }, rand(80, 135) * 1000);
   }
 
   function menu(open) {
@@ -1718,16 +1847,27 @@
       if (!yes && ui.sounding) ui.sounding.classList.remove('is-on');
     }
 
-    /* The instrument is drawn from a handful that suit the weather, so it is
-       different on every visit. Named for a few seconds when it arrives —
-       long enough to be read, short enough not to become furniture. */
+    /* Two instruments, drawn from the handful that suit the weather, so the
+       pair is different on every visit. Named for a few seconds when they
+       arrive — long enough to be read, short enough not to become furniture.
+       The second is on its own line and set fainter, which is also where it
+       is in the mix. */
     var told;
-    Sound.onvoice = function (v) {
-      if (!Sound.on || !ui.sounding) return;
-      ui.sounding.textContent = v.name + ' · ' + v.from;
+    Sound.onvoice = function (lead, second) {
+      if (!Sound.on || !ui.sounding || !lead) return;
+      ui.sounding.textContent = '';
+      var a = document.createElement('span');
+      a.textContent = lead.name + ' · ' + lead.from;
+      ui.sounding.appendChild(a);
+      if (second) {
+        var b = document.createElement('span');
+        b.className = 'sounding__second';
+        b.textContent = 'and ' + second.name + ', further off';
+        ui.sounding.appendChild(b);
+      }
       ui.sounding.classList.add('is-on');
       clearTimeout(told);
-      told = setTimeout(function () { ui.sounding.classList.remove('is-on'); }, 7000);
+      told = setTimeout(function () { ui.sounding.classList.remove('is-on'); }, 8000);
     };
 
     ui.sound.addEventListener('click', function () {
@@ -1787,6 +1927,7 @@
   function init() {
     controls();
     Sky.init();
+    rotate();
 
     // Nothing should be playing to an empty room.
     document.addEventListener('visibilitychange', function () {
@@ -1797,6 +1938,7 @@
         Sound.wasOn = false;
         Sound.start();
       }
+      if (!document.hidden) rotate();
     });
 
     var timer;

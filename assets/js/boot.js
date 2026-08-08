@@ -30,7 +30,7 @@
   var LAST = 'weather.last.v1';
 
   var pick = null;
-  try { pick = localStorage.getItem('weather.pick.v1'); } catch (e) {}
+  try { pick = localStorage.getItem('weather.pick.v2'); } catch (e) {}
 
   if (pick !== 'none' && ALL.indexOf(pick) === -1) {
     // Nothing pinned, so the room gets whatever it gets. Drawn from the five
