@@ -42,7 +42,7 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var PICK_KEY  = 'weather.pick.v2';
-  var SOUND_KEY = 'weather.sound.v2';
+  var SOUND_KEY = 'weather.sound.v3';
 
   var MAX_FPS = 40;          // soft particles gain nothing above this
   var REF_AREA = 1440 * 900; // particle counts are quoted for this screen
@@ -76,9 +76,13 @@
       sound: {
         // The hiss and the body of it. Rain is mostly high noise; the
         // bandpass underneath is what stops it sounding like tape static.
+        // Pulled well down. Rain is the only weather with real energy above
+        // a kilohertz, and high frequencies are perceptually much louder than
+        // low ones — at the old level it was masking the instruments, the
+        // drips and everything else in every other layer.
         beds: [
-          { type: 'highpass', f: 1150, q: 0.5, g: 0.080, sway: [0.6, 1.5, 11] },
-          { type: 'bandpass', f: 400,  q: 0.8, g: 0.048 }
+          { type: 'highpass', f: 1150, q: 0.5, g: 0.046, sway: [0.6, 1.5, 11] },
+          { type: 'bandpass', f: 430,  q: 0.8, g: 0.030 }
         ],
         // Water off a sill, into something. The loneliest sound there is.
         // Two clocks, so the near drops and the far ones never fall in step.
@@ -111,9 +115,13 @@
       sound: {
         // Snow is the sound of things being taken away. Everything is under
         // a low shelf; the only bright thing is the note, and it is rare.
+        // Snow was two lowpasses, one of them at 190Hz, which on most
+        // speakers is a rumble and nothing else. It has a voice now: a soft
+        // body, and above it the fine dry hiss of snow landing on snow, which
+        // is the only sound snow actually makes.
         beds: [
-          { type: 'lowpass', f: 620, q: 0.4, g: 0.022 },
-          { type: 'lowpass', f: 190, q: 0.6, g: 0.032, sway: [0.5, 1.4, 17] }
+          { type: 'lowpass',  f: 900,  q: 0.4, g: 0.037, sway: [0.5, 1.4, 17] },
+          { type: 'highpass', f: 4200, q: 0.5, g: 0.022 }
         ],
         // Ice finding somewhere to settle, and the thaw underneath it.
         drips: [
@@ -140,9 +148,11 @@
       },
       gust: { amp: 0.4, period: 21 },
       sound: {
+        // Both layers were under 300Hz and one of them under the speaker
+        // floor entirely. Lifted into the band where fog actually sits.
         beds: [
-          { type: 'lowpass', f: 300, q: 0.5, g: 0.030 },
-          { type: 'lowpass', f: 110, q: 0.7, g: 0.042, sway: [0.6, 1.3, 23] }
+          { type: 'lowpass',  f: 520, q: 0.5, g: 0.034 },
+          { type: 'bandpass', f: 240, q: 0.8, g: 0.042, sway: [0.6, 1.3, 23] }
         ],
         // Deeper and rarer than the rain's. This one is in a cave.
         drips: [
@@ -175,9 +185,13 @@
       },
       gust: { amp: 0.25, period: 13 },
       sound: {
+        // The quietest of the six, and it should be — this is a warm room
+        // with nothing happening in it. But it was so quiet the weather was
+        // effectively absent, so it gets a little more air and a thread of
+        // brightness at the top.
         beds: [
-          { type: 'lowpass', f: 1800, q: 0.4, g: 0.014, sway: [0.5, 1.3, 19] },
-          { type: 'lowpass', f: 240,  q: 0.5, g: 0.020 }
+          { type: 'bandpass', f: 760,  q: 0.5, g: 0.026, sway: [0.5, 1.3, 19] },
+          { type: 'highpass', f: 2800, q: 0.5, g: 0.011 }
         ],
         // A warm house ticking. Nobody in it.
         drips: [
@@ -206,10 +220,12 @@
       sound: {
         // The cutoff sweep *is* the wind. Everything else is the room it is
         // getting into.
+        // Was the loudest bed of all by half again. Wind is loud by nature,
+        // but not so loud that the piece disappears under it.
         beds: [
-          { type: 'bandpass', f: 320, q: 1.4, g: 0.115, sweep: [130, 900, 9.5],
+          { type: 'bandpass', f: 320, q: 1.4, g: 0.072, sweep: [130, 900, 9.5],
             sway: [0.45, 1.4, 6.5] },
-          { type: 'lowpass',  f: 95,  q: 0.7, g: 0.048 }
+          { type: 'lowpass',  f: 230, q: 0.7, g: 0.036 }
         ],
         // Something wooden taking the strain and letting it go again.
         drips: [
@@ -238,8 +254,8 @@
       gust: { amp: 0.6, period: 8 },
       sound: {
         beds: [
-          { type: 'lowpass', f: 520, q: 0.5, g: 0.036, sway: [0.5, 1.4, 13] },
-          { type: 'bandpass', f: 88, q: 2.0, g: 0.044 }
+          { type: 'lowpass',  f: 620, q: 0.5, g: 0.028, sway: [0.5, 1.4, 13] },
+          { type: 'bandpass', f: 210, q: 1.5, g: 0.033 }
         ],
         // What is left of a fire, going out, and something dripping in it.
         drips: [
@@ -259,7 +275,7 @@
       far: null,
       near: null,
       sound: {
-        beds: [{ type: 'lowpass', f: 150, q: 0.5, g: 0.016 }],
+        beds: [{ type: 'lowpass', f: 420, q: 0.5, g: 0.020 }],
         drips: [{ kind: 'drop', gap: [9, 24], f: [1100, 260], g: 0.105 }],
         distant: ['owl', 'wail', 'scops', 'abyss', 'keen', 'stone']
       }
@@ -2055,17 +2071,26 @@
     });
 
     /* Sound is on unless the visitor has turned it off.
-
-       It cannot literally begin on load — no browser will start an
-       AudioContext without a gesture, and none should — so it waits for the
-       first thing the visitor touches. On this site that is the tap that
-       lifts the veil, which means in practice the room has weather in it
-       from the moment the gallery opens.
-
-       Only events that actually grant user activation are listened for.
-       Scrolling does not count, and standing the listener down on a wheel
-       event would spend the one chance to start on an event that cannot. */
-    var GESTURES = ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click'];
+     *
+     * This used to wait for a gesture on the grounds that no browser will
+     * start an AudioContext without one. That is not true, and the code
+     * never even tried: Chrome allows it outright on any origin the visitor
+     * has played sound on before, which after one visit is everybody who
+     * comes back. Waiting meant that a returning visitor with the sound
+     * switched on still had to click something before hearing anything, and
+     * clicking something to hear sound is indistinguishable from turning the
+     * sound on.
+     *
+     * So it tries immediately, and only falls back to waiting.
+     *
+     * The fallback listens to far more than the events that grant user
+     * activation. A wheel event cannot start audio on its own, but trying on
+     * one costs nothing and the listener does not stand down until the
+     * context is confirmed running — so nothing is ever spent on an event
+     * that could not have worked.
+     */
+    var GESTURES = ['pointerdown', 'pointerup', 'touchend', 'touchstart',
+                    'keydown', 'click', 'wheel', 'scroll', 'pointermove'];
     var wanted = true;
     try {
       var saved = localStorage.getItem(SOUND_KEY);
@@ -2073,25 +2098,29 @@
     } catch (e) {}
 
     if (wanted) {
+      var listening = false;
+
+      var stand = function (down) {
+        if (down === listening) return;
+        listening = down;
+        GESTURES.forEach(function (evt) {
+          if (down) window.addEventListener(evt, wake, { passive: true, capture: true });
+          else window.removeEventListener(evt, wake, { capture: true });
+        });
+      };
+
       var wake = function () {
         if (!Sound.start()) return;
-        audible(true);
-        GESTURES.forEach(function (evt) { window.removeEventListener(evt, wake); });
-        // resume() is a promise, so the context may still be suspended for a
-        // moment. If it never comes up, put the button back rather than leave
-        // it claiming to be playing.
+        // resume() is a promise, so the context is still suspended for a
+        // moment either way. Only believe it once it is actually running,
+        // and keep listening until then.
         setTimeout(function () {
-          if (Sound.on && !Sound.live()) {
-            audible(false);
-            GESTURES.forEach(function (evt) {
-              window.addEventListener(evt, wake, { passive: true });
-            });
-          }
-        }, 900);
+          if (Sound.live()) { audible(true); stand(false); }
+        }, 350);
       };
-      GESTURES.forEach(function (evt) {
-        window.addEventListener(evt, wake, { passive: true });
-      });
+
+      stand(true);
+      wake();                       // the try that usually works
     }
 
     root.classList.add('weather-ready');
