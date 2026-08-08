@@ -232,7 +232,16 @@ The weather changes only what is weather.
 | | instruments | two of the ten, one near and one far, drawn per visit |
 | **weather** | beds | filtered noise — rain's hiss, snow's hush, wind sweeping |
 | | drips | water off a sill, ice settling, a rope creaking, embers |
-| | distance | an owl, a stone down a mountainside, a thin far sound, a swell |
+| | distance | a night bird, a stone down a mountainside, a thin far sound, a swell |
+
+Four birds, one every half-minute or so: a **tawny owl** (up into the note,
+held, let go of — then three seconds of nothing, a catch, and a long wavering
+fall), a **diver's wail** (nine semitones of rise, held, and given up), a
+**curlew** (a full octave of rise that never comes back down) and a **scops
+owl** (one soft note, four or five times over, two seconds apart). Each is a
+pitch contour sampled into a real curve, a resonance standing in for the body
+it comes out of, and breath underneath. Which birds a weather can produce is
+its `distant` list.
 
 Nothing is a recording. Every sample is generated in the browser, and no two
 layers share a clock, so it never repeats.
