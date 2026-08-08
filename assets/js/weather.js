@@ -83,8 +83,8 @@
         // Water off a sill, into something. The loneliest sound there is.
         // Two clocks, so the near drops and the far ones never fall in step.
         drips: [
-          { kind: 'drop', gap: [2.2, 7], f: [1500, 380], g: 0.10 },
-          { kind: 'drop', gap: [5, 13], f: [820, 220], g: 0.075 }
+          { kind: 'drop', gap: [2.2, 7], f: [1500, 380], g: 0.125 },
+          { kind: 'drop', gap: [5, 13], f: [820, 220], g: 0.095 }
         ],
         // Rain at night is the one that gets an owl.
         distant: ['owl', 'owl', 'wail', 'abyss', 'keen']
@@ -118,7 +118,7 @@
         // Ice finding somewhere to settle, and the thaw underneath it.
         drips: [
           { kind: 'tick', gap: [6, 16], f: [4200, 7000], g: 0.030 },
-          { kind: 'drop', gap: [9, 22], f: [1100, 300], g: 0.070 }
+          { kind: 'drop', gap: [9, 22], f: [1100, 300], g: 0.090 }
         ],
         distant: ['owl', 'wail', 'keen', 'abyss', 'stone']
       }
@@ -146,8 +146,8 @@
         ],
         // Deeper and rarer than the rain's. This one is in a cave.
         drips: [
-          { kind: 'drop', gap: [5, 14], f: [900, 210], g: 0.115 },
-          { kind: 'drop', gap: [11, 26], f: [1600, 420], g: 0.065 },
+          { kind: 'drop', gap: [5, 14], f: [900, 210], g: 0.135 },
+          { kind: 'drop', gap: [11, 26], f: [1600, 420], g: 0.085 },
           { kind: 'creak', gap: [17, 40], f: [150, 300], g: 0.055 }
         ],
         // Mist gets all four. It is the emptiest of the six and the only one
@@ -181,8 +181,9 @@
         ],
         // A warm house ticking. Nobody in it.
         drips: [
-          { kind: 'tick', gap: [9, 22], f: [2600, 4200], g: 0.022 },
-          { kind: 'creak', gap: [15, 34], f: [190, 360], g: 0.050 }
+          { kind: 'tick', gap: [9, 22], f: [2600, 4200], g: 0.030 },
+          { kind: 'creak', gap: [15, 34], f: [190, 360], g: 0.062 },
+          { kind: 'drop', gap: [13, 30], f: [1400, 380], g: 0.075 }
         ],
         // No owl in daylight. Stone, heat and distance — a desert, not a night.
         distant: ['curlew', 'curlew', 'abyss', 'keen', 'stone']
@@ -212,8 +213,9 @@
         ],
         // Something wooden taking the strain and letting it go again.
         drips: [
-          { kind: 'creak', gap: [8, 20], f: [170, 340], g: 0.075 },
-          { kind: 'tick', gap: [13, 30], f: [1800, 3400], g: 0.020 }
+          { kind: 'creak', gap: [8, 20], f: [170, 340], g: 0.090 },
+          { kind: 'tick', gap: [13, 30], f: [1800, 3400], g: 0.028 },
+          { kind: 'drop', gap: [11, 26], f: [1250, 340], g: 0.080 }
         ],
         distant: ['curlew', 'owl', 'keen', 'stone', 'abyss']
       }
@@ -242,7 +244,7 @@
         // What is left of a fire, going out, and something dripping in it.
         drips: [
           { kind: 'crackle', gap: [4, 12], f: [600, 2200], g: 0.045 },
-          { kind: 'drop', gap: [10, 24], f: [1000, 260], g: 0.070 }
+          { kind: 'drop', gap: [10, 24], f: [1000, 260], g: 0.090 }
         ],
         distant: ['scops', 'owl', 'stone', 'abyss', 'keen']
       }
@@ -258,7 +260,7 @@
       near: null,
       sound: {
         beds: [{ type: 'lowpass', f: 150, q: 0.5, g: 0.016 }],
-        drips: [{ kind: 'drop', gap: [9, 24], f: [1100, 260], g: 0.085 }],
+        drips: [{ kind: 'drop', gap: [9, 24], f: [1100, 260], g: 0.105 }],
         distant: ['owl', 'wail', 'scops', 'abyss', 'keen', 'stone']
       }
     }
@@ -312,8 +314,13 @@
     scale:  [0, 3, 5, 7, 10],                    // A  C  D  E  G
     colour: [1, 8],                              // Bb and F
     drone: { root: 55, stack: [1, 1.189, 1.5, 2], g: 0.055, cut: 300 },
-    pad:   { root: 55, stack: [1, 1.189, 1.5, 2, 2.378], g: 0.024, cut: 400 },
-    gapMul: 1
+    // A2 to C4. It sat down at the drone's octave for a while, which took
+    // the siren out of it but also put it under the floor of every laptop
+    // speaker on earth — and with it went most of the music. It is safe up
+    // here now for different reasons: it is revoiced rather than glided, it
+    // is all sine, and its voices are one cent apart instead of four.
+    pad:   { root: 110, stack: [1, 1.189, 1.5, 2], g: 0.028, cut: 600 },
+    gapMul: 0.85
   };
 
   var VOICES = {
@@ -335,7 +342,7 @@
        the reason a bonshō sounds bottomless. */
     bonsho: {
       name: 'temple bell', from: 'japan', family: 'struck',
-      oct: 0, curve: 'bell',
+      oct: 2, curve: 'bell',
       partials: [[0.5, 0.55], [1, 1], [2, 0.45], [2.98, 0.26], [4.15, 0.15], [5.43, 0.08]],
       attack: [0.006, 0.012], rel: [15, 24], g: 0.105,
       chiff: 0.28, cut: [9, 1.1, 0.9], gap: [24, 52]
@@ -386,7 +393,7 @@
        ringing. Almost every guqin phrase does this. */
     guqin: {
       name: 'guqin', from: 'china', family: 'plucked',
-      oct: 1, curve: 'pluck',
+      oct: 2, curve: 'pluck',
       partials: [[1, 1], [2, 0.26], [3, 0.09], [4, 0.04]],
       attack: [0.005, 0.012], rel: [4.5, 8], g: 0.078,
       chiff: 0.34, slide: [1.6, 0.5, 1.4], cut: [8, 1.8, 1.0], gap: [9, 21]
@@ -405,10 +412,22 @@
        them is the whole sound of a gamelan. */
     gong: {
       name: 'gong', from: 'java', family: 'struck',
-      oct: 1, curve: 'bell',
+      oct: 2, curve: 'bell',
       partials: [[1, 1], [1.5, 0.28], [2.04, 0.40], [2.9, 0.22], [4.1, 0.12]],
       attack: [0.02, 0.05], rel: [11, 20], g: 0.090,
       chiff: 0.3, shimmer: 0.7, cut: [7, 1.3, 0.9], gap: [20, 44]
+    },
+
+    /* A felt piano: the hammers muted with cloth, which takes the top off
+       the strike and leaves the warmth. There is no sadder way to play one
+       and it is the reason every film about somebody being alone in a house
+       sounds like this. */
+    piano: {
+      name: 'felt piano', from: 'europe', family: 'struck',
+      oct: 3, curve: 'pluck',
+      partials: [[1, 1], [2, 0.28], [3, 0.10], [4, 0.05], [5.4, 0.02]],
+      attack: [0.004, 0.010], rel: [4.5, 8.5], g: 0.078,
+      chiff: 0.16, cut: [7, 1.8, 1.0], gap: [6, 15]
     },
 
     /* Wet fingers on a glass rim. Three seconds to arrive, which is longer
@@ -714,14 +733,18 @@
          which is the only way to get louder without getting nearer to
          clipping. */
       var comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = -14;
+      comp.threshold.value = -16;
       comp.knee.value = 8;
-      comp.ratio.value = 4;
-      comp.attack.value = 0.01;
-      comp.release.value = 0.3;
+      comp.ratio.value = 5;
+      comp.attack.value = 0.008;
+      comp.release.value = 0.28;
 
+      // Measured at 2.2 the loudest moments reached 0.95 of full scale, which
+      // is not clipping but is close enough that a browser resampling to a
+      // different rate could push it over. The ratio does the extra work
+      // instead, so the average stays where it is and only the peaks move.
       var makeup = ctx.createGain();
-      makeup.gain.value = 2.2;
+      makeup.gain.value = 1.95;
 
       this.master.connect(comp);
       comp.connect(makeup);
@@ -1003,8 +1026,8 @@
         // Any voice past the end of the stack is silent — a four-note chord
         // in a five-voice bank leaves one voice out rather than doubling one.
         var g = i < d.stack.length ? d.g * live : 0;
-        p.gain.gain.setTargetAtTime(g * 0.62, now, ramp * 0.5);
-        p.depth.gain.setTargetAtTime(g * 0.38, now, ramp * 0.5);
+        p.gain.gain.setTargetAtTime(g * 0.55, now, ramp * 0.5);
+        p.depth.gain.setTargetAtTime(g * 0.45, now, ramp * 0.5);
       });
     },
 
@@ -1034,8 +1057,8 @@
           var now = ctx.currentTime;
           var g = (i < d.stack.length && self.on) ? d.g : 0;
           p.osc.frequency.setValueAtTime(d.root * d.stack[i % d.stack.length], now);
-          p.gain.gain.setTargetAtTime(g * 0.62, now, stagger * 0.55);
-          p.depth.gain.setTargetAtTime(g * 0.38, now, stagger * 0.55);
+          p.gain.gain.setTargetAtTime(g * 0.55, now, stagger * 0.55);
+          p.depth.gain.setTargetAtTime(g * 0.45, now, stagger * 0.55);
         }, (i * stagger + stagger * 2.4) * 1000);
       });
     },
@@ -1095,7 +1118,7 @@
           ? (slot ? rand(9, 17) : rand(2.5, 6))
           : rand(v.gap[0], v.gap[1]) * self.gapMul * (slot ? 1.7 : 1);
         self[key] = setTimeout(function () {
-          self.strike(v, slot ? self.room : self.bus, slot ? 0.5 : 1);
+          self.strike(v, slot ? self.room : self.bus, slot ? 0.7 : 1.3);
           self.again(slot);
         }, wait * 1000);
       });
@@ -1110,7 +1133,7 @@
       if (!this.on || !v) return;
       var wait = rand(v.gap[0], v.gap[1]) * this.gapMul * (slot ? 1.7 : 1);
       this[key] = setTimeout(function () {
-        self.strike(v, slot ? self.room : self.bus, slot ? 0.5 : 1);
+        self.strike(v, slot ? self.room : self.bus, slot ? 0.7 : 1.3);
         self.again(slot);
       }, wait * 1000);
     },
@@ -1549,7 +1572,7 @@
     night: function (node, pan) {
       var ctx = this.ctx;
       var dry = ctx.createGain();
-      dry.gain.value = 0.42;
+      dry.gain.value = 0.32;
       if (ctx.createStereoPanner) {
         var p = ctx.createStereoPanner();
         p.pan.value = pan === undefined ? rand(-0.8, 0.8) : pan;

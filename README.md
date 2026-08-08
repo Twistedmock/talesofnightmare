@@ -246,9 +246,10 @@ its `distant` list.
 Nothing is a recording. Every sample is generated in the browser, and no two
 layers share a clock, so it never repeats.
 
-The ten instruments are shakuhachi, temple bell and koto (japan), cedar flute
-(north america), duduk (armenia), bansuri (india), guqin (china), kalimba (east
-africa), gong (java) and glass (europe). Two are drawn each visit, never from
+The eleven instruments are shakuhachi, temple bell and koto (japan), cedar
+flute (north america), duduk (armenia), bansuri (india), guqin (china), kalimba
+(east africa), gong (java), glass and felt piano (europe). Two are drawn each
+visit, never from
 the same family — a flute answered by something plucked or struck. They keep
 their own timbre, ornaments and register but all play from the same scale, so
 they are two instruments in one piece rather than two pieces at once. Whichever
@@ -259,6 +260,13 @@ for the piece, and one entry per weather for what falls and what it sounds like.
 To drop a weather, remove it from `ORDER` there **and** from `ALL` in
 `assets/js/boot.js`, which picks the weather before the first paint so the
 palette never flashes.
+
+**A note on register.** Everything has to live above about 150Hz, because that
+is where laptop and phone speakers stop reproducing. The pad spent one revision
+down at the drone's octave — which fixed a resonance problem and made the music
+inaudible on the machines most people use, since 96% of the energy was under
+250Hz and simply never left the speaker. If you retune anything here, check
+where the energy lands as well as how it sounds on your own monitors.
 
 > Both stored preferences are versioned (`weather.pick.v2`, `weather.sound.v2`).
 > Bump the suffix to hand every visitor a clean default back — a pin or a mute
